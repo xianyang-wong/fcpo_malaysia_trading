@@ -44,5 +44,3 @@ parsed.describe()
 
 plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
 plt.show()
-
-parsed.describe()
