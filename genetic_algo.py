@@ -104,6 +104,23 @@ def mutation(iteration_best80pct, mutation_pct, rule_choices):
     
     return collection_mutate
 
+def evolve(collection, rule_choices, fitness, crossover_pct, mutation_pct):
+    
+    # Select best two rulesets from last iteration
+    iteration_collection = roulette_wheel(collection, fitness, 2)
+    # Randomly generate two new rulesets
+    iteration_collection = np.append(iteration_collection, generate_collection(2, 10, rule_choices), axis=0)
+    # Select best 16 from original 20 rulesets
+    iteration_best80pct = roulette_wheel(collection, fitness, 16)
+    # Carry out crossover
+    iteration_best80pct = crossover(iteration_best80pct, crossover_pct)
+    # Carry out mutation
+    iteration_best80pct = mutation(iteration_best80pct, mutation_pct, rule_choices)
+    
+    iteration_collection = np.append(iteration_collection, iteration_best80pct, axis=0)
+
+    return iteration_collection
+
 # Create collection of 20 different ruleset consisting of 10 rules each
 rule_choices = {
     'moving_average_choices' : [0,1,2,3],
@@ -112,15 +129,6 @@ rule_choices = {
     'membership_choices' : [0,1,2,3,4,5,6],        
         }
 collection = generate_collection(20, 10, rule_choices)
-# Select best two rulesets from last iteration
-fitness = np.array(range(0,20))
-iteration_collection = roulette_wheel(collection, fitness, 2)
-# Randomly generate two new rulesets
-iteration_collection = np.append(iteration_collection, generate_collection(2, 10, rule_choices), axis=0)
-# Select best 16 from original 20 rulesets
-iteration_best80pct = roulette_wheel(collection, fitness, 16)
-# Carry out crossover
-iteration_best80pct = crossover(iteration_best80pct, 0.7)
-# Carry out mutation
-iteration_best80pct = mutation(iteration_best80pct, 0.1, rule_choices)
 
+fitness = np.array(range(0,20))
+collection_evolve = evolve(collection, rule_choices, fitness, 0.7, 0.01)
