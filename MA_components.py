@@ -1,13 +1,13 @@
 
 ##----------------- Helper Functions-----------------------##
 
-def smafunc(startindex, endindex, period):
+def smafunc(startindex, endindex, period, df):
     
-    lst = closePrice[startindex:endindex]
+    lst = df[startindex:endindex]
     sma = []
     count = startindex
     
-    while count + period <= endindex:
+    while count + period < endindex:
         start = count
         end = count + period
         sma += [sum(lst[start:end])/period,]
@@ -15,13 +15,13 @@ def smafunc(startindex, endindex, period):
         
     return sma        
         
-def tmafunc(startindex, endindex, period):
+def tmafunc(startindex, endindex, period, df):
 
-    lst = smafunc(startindex, endindex, period)
+    lst = smafunc(startindex, endindex, period, df)
     tma= []
     count = startindex
 
-    while count + period <= len(lst):
+    while count + period < len(lst):
         start = count
         end = count + period
         tma += [sum(lst[start:end])/period,]
@@ -29,13 +29,13 @@ def tmafunc(startindex, endindex, period):
         
     return tma
 
-def tpmafunc(startindex, endindex, period):
+def tpmafunc(startindex, endindex, period, df):
 
-    lst = closePrice[startindex:endindex]
+    lst = df[startindex:endindex]
     tpma = []
     count = startindex
 
-    while count + period <= endindex:
+    while count + period < endindex:
         start = count
         end = count + period
         _lst = lst[start:end]
@@ -47,9 +47,9 @@ def tpmafunc(startindex, endindex, period):
         
     return tpma
 
-def amafunc(startindex, endindex, period):
+def amafunc(startindex, endindex, period, df):
     
-    lst = closePrice[startindex:endindex]
+    lst = df[startindex:endindex]
     ini_ama = sum(lst[:period])/period
     ama = [ini_ama,]
     count = startindex
@@ -79,18 +79,16 @@ def amafunc(startindex, endindex, period):
 
 # Main Function
 
-def computeMA(typeMA, startindex, endindex, period, dataframes):
-
-    closePrice = dataframes['Close']
+def computeMA(typeMA, startindex, endindex, period, df):
 
     if typeMA == 'sma':
-        return smafunc(startindex, endindex, period)
+        return smafunc(startindex, endindex, period, df)
     elif typeMA == 'tma':
-        return tmafunc(startindex, endindex, period)
+        return tmafunc(startindex, endindex, period, df)
     elif typeMA == 'tpma':
-        return tpmafunc(startindex, endindex, period)
+        return tpmafunc(startindex, endindex, period, df)
     elif typeMA == 'ama':
-        return amafunc(startindex, endindex, period)
+        return amafunc(startindex, endindex, period, df)
     else:
         return []
 
