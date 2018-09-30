@@ -81,13 +81,13 @@ def amafunc(startindex, endindex, period, df):
 
 def computeMA(typeMA, startindex, endindex, period, df):
 
-    if typeMA == 'sma':
+    if typeMA == 0:
         return smafunc(startindex, endindex, period, df)
-    elif typeMA == 'tma':
+    elif typeMA == 1:
         return tmafunc(startindex, endindex, period, df)
-    elif typeMA == 'tpma':
+    elif typeMA == 2:
         return tpmafunc(startindex, endindex, period, df)
-    elif typeMA == 'ama':
+    elif typeMA == 3:
         return amafunc(startindex, endindex, period, df)
     else:
         return []
