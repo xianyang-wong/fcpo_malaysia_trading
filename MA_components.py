@@ -5,7 +5,7 @@ def smafunc(startindex, endindex, period):
     
     lst = closePrice[startindex:endindex]
     sma = []
-    count = 0
+    count = startindex
     
     while count + period <= endindex:
         start = count
@@ -19,7 +19,7 @@ def tmafunc(startindex, endindex, period):
 
     lst = smafunc(startindex, endindex, period)
     tma= []
-    count = 0
+    count = startindex
 
     while count + period <= len(lst):
         start = count
@@ -33,7 +33,7 @@ def tpmafunc(startindex, endindex, period):
 
     lst = closePrice[startindex:endindex]
     tpma = []
-    count = 0
+    count = startindex
 
     while count + period <= endindex:
         start = count
@@ -52,7 +52,7 @@ def amafunc(startindex, endindex, period):
     lst = closePrice[startindex:endindex]
     ini_ama = sum(lst[:period])/period
     ama = [ini_ama,]
-    count = 0
+    count = startindex
     fastSC = 2/(1 + 2)
     slowSC = 2/(1 + 30)
 
