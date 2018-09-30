@@ -7,7 +7,7 @@ def smafunc(startindex, endindex, period, df):
     sma = []
     count = startindex
     
-    while count + period < endindex:
+    while count + period <= endindex:
         start = count
         end = count + period
         sma += [sum(lst[start:end])/period,]
@@ -21,7 +21,7 @@ def tmafunc(startindex, endindex, period, df):
     tma= []
     count = startindex
 
-    while count + period < len(lst):
+    while count + period <= len(lst):
         start = count
         end = count + period
         tma += [sum(lst[start:end])/period,]
@@ -35,7 +35,7 @@ def tpmafunc(startindex, endindex, period, df):
     tpma = []
     count = startindex
 
-    while count + period < endindex:
+    while count + period <= endindex:
         start = count
         end = count + period
         _lst = lst[start:end]
