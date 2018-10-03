@@ -16,9 +16,14 @@ def smafunc(startindex, endindex, period, df):
     return sma       
         
 def tmafunc(startindex, endindex, period, df):
+    
+    if startindex < period:
+        new_startindex = 0
+    else:
+        new_startindex = startindex - period + 1
 
     lst = smafunc(startindex, endindex, period, df)
-     tma= []
+    tma= []
     count = 0
 
     while count + period <= len(lst):
@@ -81,14 +86,19 @@ def amafunc(startindex, endindex, period, df):
 
 def computeMA(typeMA, startindex, endindex, period, df):
 
+    if startindex <= period:
+        new_startindex = 0
+    else:
+        new_startindex = startindex - period
+
     if typeMA == 0:
-        return smafunc(startindex, endindex, period, df)
+        return smafunc(new_startindex, endindex, period, df)
     elif typeMA == 1:
-        return tmafunc(startindex, endindex, period, df)
+        return tmafunc(new_startindex, endindex, period, df)
     elif typeMA == 2:
-        return tpmafunc(startindex, endindex, period, df)
+        return tpmafunc(new_startindex, endindex, period, df)
     elif typeMA == 3:
-        return amafunc(startindex, endindex, period, df)
+        return amafunc(new_startindex, endindex, period, df)
     else:
         return []
 
