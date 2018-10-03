@@ -3,23 +3,28 @@
 
 def smafunc(startindex, endindex, period, df):
     
-    lst = df[startindex:endindex]
+    lst = list(df[startindex:endindex])
     sma = []
-    count = startindex
-    
-    while count + period <= endindex:
+    count = 0
+
+    while count + period <= endindex-startindex:
         start = count
         end = count + period
         sma += [sum(lst[start:end])/period,]
         count += 1
         
-    return sma        
+    return sma       
         
 def tmafunc(startindex, endindex, period, df):
+    
+    if startindex < period:
+        new_startindex = 0
+    else:
+        new_startindex = startindex - period + 1
 
     lst = smafunc(startindex, endindex, period, df)
     tma= []
-    count = startindex
+    count = 0
 
     while count + period <= len(lst):
         start = count
@@ -31,17 +36,17 @@ def tmafunc(startindex, endindex, period, df):
 
 def tpmafunc(startindex, endindex, period, df):
 
-    lst = df[startindex:endindex]
+    lst = list(df[startindex:endindex])
     tpma = []
-    count = startindex
+    count = 0
 
-    while count + period <= endindex:
+    while count + period <= endindex - startindex:
         start = count
         end = count + period
-        _lst = lst[start:end]
-        max_price = max(_lst)
-        min_price = min(_lst)
-        close_price = _lst[count]
+        temp_lst = list(lst[start:end])
+        max_price = max(temp_lst)
+        min_price = min(temp_lst)
+        close_price = temp_lst[0]
         tpma += [(max_price + min_price + close_price)/3,]
         count += 1
         
@@ -49,14 +54,14 @@ def tpmafunc(startindex, endindex, period, df):
 
 def amafunc(startindex, endindex, period, df):
     
-    lst = df[startindex:endindex]
+    lst = list(df[startindex:endindex])
     ini_ama = sum(lst[:period])/period
     ama = [ini_ama,]
-    count = startindex
+    count = 0
     fastSC = 2/(1 + 2)
     slowSC = 2/(1 + 30)
 
-    while count + period < endindex:
+    while count + period < endindex - startindex:
 
         start = count
         end = count + period
@@ -81,14 +86,19 @@ def amafunc(startindex, endindex, period, df):
 
 def computeMA(typeMA, startindex, endindex, period, df):
 
-    if typeMA == 'sma':
-        return smafunc(startindex, endindex, period, df)
-    elif typeMA == 'tma':
-        return tmafunc(startindex, endindex, period, df)
-    elif typeMA == 'tpma':
-        return tpmafunc(startindex, endindex, period, df)
-    elif typeMA == 'ama':
-        return amafunc(startindex, endindex, period, df)
+    if startindex <= period:
+        new_startindex = 0
+    else:
+        new_startindex = startindex - period
+
+    if typeMA == 0:
+        return smafunc(new_startindex, endindex, period, df)
+    elif typeMA == 1:
+        return tmafunc(new_startindex, endindex, period, df)
+    elif typeMA == 2:
+        return tpmafunc(new_startindex, endindex, period, df)
+    elif typeMA == 3:
+        return amafunc(new_startindex, endindex, period, df)
     else:
         return []
 
