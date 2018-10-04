@@ -23,7 +23,7 @@ def tmafunc(startindex, endindex, period, df):
     else:
         new_startindex = startindex - period + 1
 
-    lst = smafunc(startindex, endindex, period, df)
+    lst = smafunc(new_startindex, endindex, period, df)
     tma= []
     count = 0
 
