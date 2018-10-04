@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-directory = ''
+directory = '/Users/qingtao/OneDrive - National University of Singapore/MTech/01 KE5207/computational intelligence ii/CA/fcpo_malaysia_trading/'
 data = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS.xlsx'))
 data.columns = data.columns.str.strip()
 
@@ -42,5 +42,14 @@ parsed = parse_futures_data(data, ['Open','High','Low','Close','Volume'])
 
 parsed.describe()
 
-plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
-plt.show()
+# plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
+# plt.show()
+
+data['Flag'] = data['Date'].diff()
+data.loc[data.Date != data.Date.shift(-1), 'Flag'] = 2 # 2=closing time
+data.loc[data['Flag']>2,'Flag']=1 # 1=opening time
+
+out_path = directory
+writer = pd.ExcelWriter(os.path.join(directory,'data/FCPO_6_years_NUS'+ '_Parsed' +'.xlsx'))
+data.to_excel(writer)
+writer.save()    
