@@ -57,7 +57,7 @@ memo = {}
 
 def amafunc(startindex, endindex, period, df):
     
-    lst = list(df[startindex:endindex])
+    lst = list(df[:endindex])
     ama_lst = []
     count = startindex
 
