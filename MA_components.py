@@ -1,4 +1,5 @@
 
+import sys
 ##----------------- Helper Functions-----------------------##
 
 def smafunc(startindex, endindex, period, df):
@@ -52,33 +53,63 @@ def tpmafunc(startindex, endindex, period, df):
         
     return tpma
 
+memo = {}
+
 def amafunc(startindex, endindex, period, df):
     
     lst = list(df[startindex:endindex])
-    ini_ama = sum(lst[:period])/period
-    ama = [ini_ama,]
-    count = 0
-    fastSC = 2/(1 + 2)
-    slowSC = 2/(1 + 30)
+    ama_lst = []
+    count = startindex
 
-    while count + period < endindex - startindex:
-
-        start = count
-        end = count + period
-        signal = abs(lst[end] - lst[start+1])
-        i = start
-        noise = 0
-
-        while i < end:
-            noise += abs(lst[i+1]-lst[i])
-            i += 1
-
-        ER_k = signal / noise
-        SSC_k = ER_k * (fastSC - slowSC) + slowSC
-        ama += [ama[count] + (SSC_k**2)*(lst[end]-ama[count]),]
+    while count + period <= endindex:
+        ama_lst += [ama(count, period, lst),]
         count += 1
 
-    return ama
+    return ama_lst
+
+def ama(k, period, lst):
+    
+    if k <= 0:
+        memo[0] = sum(lst[:period])/period
+        return memo[0]
+    
+    elif k in memo.keys():
+        return memo[k]
+    
+    else:
+        fastSC = 2/(1 + 2)
+        slowSC = 2/(1 + 30)
+        
+        if k <= period & k <= 1:
+            k_1 = 2
+            k_n = 1
+        elif k <= period & k > 1:
+            k_1 = k - 1
+            k_n = 1
+        else:
+            k_1 = k - 1
+            k_n = k - period
+        
+        signal = abs(lst[k_1] - lst[k_n])
+        i = k_n
+        noise = 0
+
+        while i <= k_1:
+            temp = abs(lst[i]-lst[i-1])
+            noise += temp
+            i += 1
+            
+        if noise == 0:
+            ER_k = 0
+        else:
+            ER_k = signal / noise
+            
+        SSC_k = ER_k * (fastSC - slowSC) + slowSC
+        memo[k-1] = ama(k - 1, period, lst)
+        ama_k = memo[k-1] + (SSC_k**2)*(lst[k_1] - memo[k-1])
+        memo[k] = ama_k
+        return memo[k]
+
 
 ##-------------------------------------------------------------##
 
@@ -86,19 +117,22 @@ def amafunc(startindex, endindex, period, df):
 
 def computeMA(typeMA, startindex, endindex, period, df):
 
+    tempDf = df['Close']
+    
     if startindex <= period:
         new_startindex = 0
     else:
         new_startindex = startindex - period
 
     if typeMA == 0:
-        return smafunc(new_startindex, endindex, period, df)
+        return smafunc(new_startindex, endindex, period, tempDf)
     elif typeMA == 1:
-        return tmafunc(new_startindex, endindex, period, df)
+        return tmafunc(new_startindex, endindex, period, tempDf)
     elif typeMA == 2:
-        return tpmafunc(new_startindex, endindex, period, df)
+        return tpmafunc(new_startindex, endindex, period, tempDf)
     elif typeMA == 3:
-        return amafunc(new_startindex, endindex, period, df)
+        sys.setrecursionlimit(endindex)
+        return amafunc(new_startindex, endindex, period, tempDf)
     else:
         return []
 
