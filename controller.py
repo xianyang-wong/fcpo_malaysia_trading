@@ -9,6 +9,7 @@ Created on Sun Sep 23 09:50:16 2018
 import pandas as pd
 import parse as parsed
 import os
+import FitnessFunction as ffn
 
 
 directory = '/Users/qingtao/OneDrive - National University of Singapore/MTech/01 KE5207/computational intelligence ii/CA/fcpo_malaysia_trading/'
@@ -45,5 +46,6 @@ for i in range (0, 69):
     
     y1=y4
     # call fitness function
-#    FF = FitnessFunction()
+    FF = ffn.FitnessFunction(y1,y2,y3,y4,parsed)
+
 
