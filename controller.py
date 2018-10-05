@@ -58,6 +58,7 @@ for i in range (0, 69):
         if BestReturn < result.max(skipna=True):
             BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
             debug.append(result.max(skipna=True))
+            BestReturn = result.max(skipna=True)
         Collection = evolve(Collection, rule_choices, result.values, 0.7, 0.01)
     #Apply best individual to test section then record total asset.
     print(debug)
