@@ -2,14 +2,11 @@ import pandas as pd
 import Fuzzy_Logic as fuzzy
 import MA_components as maComp
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
+
 class FitnessFunction:
     #rule:{a,b,c,d,e} a:MA 0-3 ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
     InitialCapital=1000000
     #initial capital
-    StartIndex = 20
-    #starting index of calculation
-    EndIndex= 22
-    #end index
    
     Deposit = 0.15
     #Holding   Deposit
@@ -29,7 +26,7 @@ class FitnessFunction:
         else:
             return sum(list)/len(list)
 
-    def __init__(self,s0,s1,s2,s3,df):
+    def __init__(self,s0,s1,df,Collection):
         self.DfFitness = pd.DataFrame(np.array([1000000.0,0,0,0,0,0]*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
         self.StartIndex = s0
         self.EndIndex = s1
@@ -42,7 +39,7 @@ class FitnessFunction:
             for ruleSet in Collection:
                 tmpList=[]
                 for rule in ruleSet:
-                    MAd = self.MA_Diff(0,rule[1][1],rule[1][0],index)
+                    MAd = self.MA_Diff(rule[0],rule[1][1],rule[1][0],index)
                     recommandValue = floglic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0]),int(rule[2]))
                     if recommandValue >= 0:
                         tmpList.append(recommandValue* rule[3])
@@ -52,10 +49,8 @@ class FitnessFunction:
             #store buffer
 
             #Calculate Holding,if reaching the end of session, sell all holdings to cash out.
-            #if index != self.EndIndex-1:
-            print(self.DfFitness.deposit)
-            TmpDfFitness['holding'] = ((self.InitialCapital - self.DfFitness['deposit']) /(df.iloc[index]['High'] * self.Deposit))* self.DfRlevel
-            print(TmpDfFitness.holding)
+            if index != self.EndIndex-1:
+                TmpDfFitness['holding'] = ((self.InitialCapital - self.DfFitness['deposit']) /(df.iloc[index]['High'] * self.Deposit))* self.DfRlevel
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):
                 HoldingDiff = self.DfFitness.iloc[IndividualCount]['holding'] - TmpDfFitness.iloc[IndividualCount]['holding']
@@ -94,11 +89,7 @@ class FitnessFunction:
 
         
     def getRreturn(self):
-        print(self.DfFitness)
-        print((self.DfFitness.profit  - self.DfFitness.cost)/self.InitialCapital)
+        return ((self.DfFitness.profit  - self.DfFitness.cost)/self.InitialCapital)
     
     def getTotalAsset(self):
-        print(self.InitialCapital + self.DfFitness.profit - self.DfFitness.cost)
-        
-FF =FitnessFunction(200,1000,34,43,df)
-FF.getRreturn()
+        print(self.InitialCapital + self.DfFitness.profit - self.DfFitness.cost )
