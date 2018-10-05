@@ -17,31 +17,29 @@ print('--------------')
 print(len(parsed))
 groupSize = int(len(parsed)/69)
 subGroupSize = int(groupSize/4)
+groupLength = int(len(parsed)/subGroupSize) - 3
 print(groupSize)
 print(subGroupSize)
 print('--------------')
 
-x=0
 y1=0
 y2=0
 y3=0
 y4=0
 Collection = generate_collection(20, 10, rule_choices)
 
-for i in range (0, 69):
-    x += groupSize
-    print('Group'+ str(i+1) + ' Size: ' + str(x))
-    for j in range (0,4):
-        y1 += subGroupSize
-        yTmp = y1 + subGroupSize
-        y2 = yTmp + subGroupSize
-        y3 = y2
-        y4 = y3 + subGroupSize
-        print('Sub Group Index 1: '+ str(y1))
-        print('Sub Group Index 2: '+ str(y2))
-        print('Sub Group Index 3: '+ str(y3))
-        print('Sub Group Index 4: '+ str(y4))
-        break
+for j in range (0,groupLength):
+    print('Group: '+ str(j+1))
+    y1 += subGroupSize
+    yTmp = y1 + subGroupSize
+    y2 = yTmp + subGroupSize
+    y3 = y2
+    y4 = y3 + subGroupSize
+    print('Sub Group Index 1: '+ str(y1))
+    print('Sub Group Index 2: '+ str(y2))
+    print('Sub Group Index 3: '+ str(y3))
+    print('Sub Group Index 4: '+ str(y4))
+
     
     #Apply first random rule on training section
     FF =FitnessFunction(y1,y2,df,Collection)
@@ -65,4 +63,3 @@ for i in range (0, 69):
     Collection = BestIndividual
     FF =FitnessFunction(y3,y4,df,Collection)
     FF.getTotalAsset()
-    y1=y4
