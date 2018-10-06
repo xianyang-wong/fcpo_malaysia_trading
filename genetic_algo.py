@@ -90,14 +90,14 @@ def crossover(iteration_best80pct, crossover_pct):
     return collection_cross
       
 def mutation(iteration_best80pct, mutation_pct, rule_choices):
-    
+
     #print('List of Mutations')
     collection_mutate = iteration_best80pct.copy()
     for i in range(0,len(iteration_best80pct)):
         for j in range(0,len(iteration_best80pct[i])):
             for k in range(0,len(iteration_best80pct[i][j])):
                 if random.uniform(0,1) <= mutation_pct:
-                    #print(i,j,k)
+                    # Carrying out individual rule choice randomization
                     if k in range(0,len(rule_choices.keys())):
                         collection_mutate[i][j][k] = random.choice(rule_choices[list(rule_choices.keys())[k]])
                     else:
@@ -107,7 +107,24 @@ def mutation(iteration_best80pct, mutation_pct, rule_choices):
                             collection_mutate[i][j][k] = random.choice([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
                         else:
                             collection_mutate[i][j][k] = random.choice([-1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
-    
+
+                    # Crossover amongst rules within ruleset
+                    partner_list = [0,1,2,3,4,5,6,7,8,9]
+                    partner_list2 = [partner for partner in partner_list if partner != j]
+                    crossover_point = random.choice(range(1, len(collection_mutate[i][j]) - 1))
+                    partner_choice = random.choice(partner_list2)
+
+                    ruleset_a = collection_mutate[i][j][:crossover_point]
+                    ruleset_b = collection_mutate[i][j][crossover_point:]
+                    partner_a = collection_mutate[i][partner_choice][:crossover_point]
+                    partner_b = collection_mutate[i][partner_choice][crossover_point:]
+
+                    ruleset_cross = ruleset_a + partner_b
+                    partner_cross = partner_a + ruleset_b
+
+                    collection_mutate[i][j] = ruleset_cross
+                    collection_mutate[i][partner_choice] = partner_cross
+
     return collection_mutate
 
 def evolve(collection, rule_choices, fitness, crossover_pct, mutation_pct):
