@@ -53,63 +53,40 @@ def tpmafunc(startindex, endindex, period, df):
         
     return tpma
 
-memo = {}
-
 def amafunc(startindex, endindex, period, df):
     
-    lst = list(df[:endindex])
-    ama_lst = []
-    count = startindex
-
-    while count + period <= endindex:
-        ama_lst += [ama(count, period, lst),]
-        count += 1
-
-    return ama_lst
-
-def ama(k, period, lst):
-    
-    if k <= 0:
-        memo[0] = sum(lst[:period])/period
-        return memo[0]
-    
-    elif k in memo.keys():
-        return memo[k]
-    
-    else:
-        fastSC = 2/(1 + 2)
-        slowSC = 2/(1 + 30)
+    lst = list(df[startindex:endindex])
+    ini_ama = sum(lst[:period])/period
         
-        if k <= period & k <= 1:
-            k_1 = 2
-            k_n = 1
-        elif k <= period & k > 1:
-            k_1 = k - 1
-            k_n = 1
-        else:
-            k_1 = k - 1
-            k_n = k - period
-        
+    ama = [ini_ama,]
+    fastSC = 2/(1 + 2)
+    slowSC = 2/(1 + 30)
+
+    k_1 = period 
+    k_n = 1
+    k = 1
+
+    while k_1 < endindex-startindex:
         signal = abs(lst[k_1] - lst[k_n])
         i = k_n
         noise = 0
 
         while i <= k_1:
-            temp = abs(lst[i]-lst[i-1])
-            noise += temp
+            noise += abs(lst[i]-lst[i-1])
             i += 1
-            
+
         if noise == 0:
             ER_k = 0
         else:
             ER_k = signal / noise
             
         SSC_k = ER_k * (fastSC - slowSC) + slowSC
-        memo[k-1] = ama(k - 1, period, lst)
-        ama_k = memo[k-1] + (SSC_k**2)*(lst[k_1] - memo[k-1])
-        memo[k] = ama_k
-        return memo[k]
+        ama += [ama[k - 1] + (SSC_k**2)*(lst[k - 1]-ama[k - 1]),]
+        k_1 += 1
+        k_n += 1
+        k += 1
 
+    return ama
 
 ##-------------------------------------------------------------##
 
@@ -131,7 +108,6 @@ def computeMA(typeMA, startindex, endindex, period, df):
     elif typeMA == 2:
         return tpmafunc(new_startindex, endindex, period, tempDf)
     elif typeMA == 3:
-        sys.setrecursionlimit(endindex)
         return amafunc(new_startindex, endindex, period, tempDf)
     else:
         return []
