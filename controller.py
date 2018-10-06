@@ -28,8 +28,8 @@ y3=0
 y4=0
 Collection = generate_collection(20, 10, rule_choices)
 
-for j in range (0,groupLength):
-    print('Group: '+ str(j+1))
+for i in range (0,groupLength):
+    print('Group: '+ str(i+1))
     y1 += subGroupSize
     yTmp = y1 + subGroupSize
     y2 = yTmp + subGroupSize
