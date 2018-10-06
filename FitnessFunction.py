@@ -1,6 +1,7 @@
 import pandas as pd
 import Fuzzy_Logic as fuzzy
 import MA_components as maComp
+import numpy as np
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
 class FitnessFunction:
