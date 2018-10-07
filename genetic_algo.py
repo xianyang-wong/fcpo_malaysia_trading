@@ -159,10 +159,10 @@ rule_choices = {
         }
 
 # Create collection of 20 different ruleset consisting of 10 rules each
-collection = generate_collection(20, 10, rule_choices)
+#collection = generate_collection(20, 10, rule_choices)
 
 # Simulated fitness values
-fitness = np.array(range(0,20))
+#fitness = np.array(range(0,20))
 
 # Evolving collection based on fitness values, crossover rate of 70%, and mutation rate of 1%
-collection_evolve = evolve(collection, rule_choices, fitness, 0.7, 0.01)
+#collection_evolve = evolve(collection, rule_choices, fitness, 0.7, 0.01)

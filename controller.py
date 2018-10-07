@@ -5,7 +5,8 @@ Created on Sun Sep 23 09:50:16 2018
 
 @author: qingtao
 """
-
+import FitnessFunction 
+import genetic_algo
 import pandas as pd
 import os
 
@@ -27,7 +28,7 @@ y2=0
 y3=0
 y4=0
 
-Collection = generate_collection(20, 10, rule_choices)
+Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
 
 for i in range (0,groupLength):
     print('Group: '+ str(i+1))
@@ -44,24 +45,24 @@ for i in range (0,groupLength):
 
     
     #Apply first random rule on training section
-    FF =FitnessFunction(y1,y2,df,Collection)
+    FF =FitnessFunction.FitnessFunction(y1,y2,parsed,Collection)
     result = FF.getRreturn()
-    Collection = evolve(Collection, rule_choices, result.values, 0.7, 0.01)
-    BestReturn=-10
+    Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
+    BestReturn=-101
     BestIndividual=[[]]
     debug=[]
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,51):#some code to keep track of the best individual!!!!
-        FF =FitnessFunction(y1,y3,df,Collection)
+        FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection)
         result = FF.getRreturn()
         print(result)
         if BestReturn < result.max(skipna=True):
             BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
             debug.append(result.max(skipna=True))
             BestReturn = result.max(skipna=True)
-        Collection = evolve(Collection, rule_choices, result.values, 0.7, 0.01)
+        Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     #Apply best individual to test section then record total asset.
     print(debug)
     Collection = BestIndividual
-    FF =FitnessFunction(y3,y4,df,Collection)
+    FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection)
     FF.getTotalAsset()
