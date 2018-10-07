@@ -12,7 +12,7 @@ class FitnessFunction:
     Deposit = 0.15
     #Holding   Deposit
     rfrate = 0.02
-    #risk free return
+    #risk free return,year rate
 
     #caculate moving average at give index, will call SeeTing function ,here use SMA instead.
     def MA_Diff(self,MAType,m,n,index,df):#SMA as demo
