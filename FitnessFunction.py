@@ -75,8 +75,6 @@ class FitnessFunction:
             TmpDfFitness['deposit'] = abs(self.DfFitness['holding']) * df.High[index] * self.Deposit
             #calculate deposit
             TmpDfFitness['cost'] = TmpDfFitness[['cost', 'MinCost']].max(axis=1)
-            #calculate riskFree
-            TmpDfFitness['riskfree'] = self.DfFitness.riskfree + self.rfrate * (self.InitialCapital - df.High[index] * self.Deposit * TmpDfFitness['holding'].abs() )
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
             for IndividualCount in range(0,20):#do not trade if no capital
@@ -86,10 +84,12 @@ class FitnessFunction:
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]
             if df.Flag[index] == 2:# clear daily holding profit
                 self.DfFitness.profit += self.DfFitness.holding * (df.Open[index] - df.Open[self.DailyFirstIndex])
-        
+                #calculate riskFree
+                self.DfFitness.riskfree += self.rfrate * (self.InitialCapital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
+                
     def getRreturn(self):
-        return ((self.DfFitness.profit  - self.DfFitness.cost)/self.InitialCapital)
+        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost)/self.InitialCapital)
     
     def getTotalAsset(self):
-        totalAsset= self.InitialCapital + self.DfFitness.profit - self.DfFitness.cost
+        totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost
         print("Total asset is :",totalAsset[0])

@@ -21,7 +21,7 @@ parsedByDay = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed
 GA_Iterations=51
 # Num_of_groups=69
 
-dfType = 1 # run datafile by day
+dfType = 2 # 1: run datafile by min   2:run datafile by day
 if dfType == 1:
     Num_of_groups = 69
 elif dfType == 2:
@@ -62,9 +62,9 @@ for i in range (0,groupLength):
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic)
     result = FF.getRreturn()
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
-    BestReturn=-101
+    BestReturn=-10
     BestIndividual=[[]]
-    debug=[]
+    rreturnLog=[]
     flogic = fuzzy.FuzzyLogic(y2, y3,parsed)
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
@@ -74,11 +74,11 @@ for i in range (0,groupLength):
         #print(result)
         if BestReturn < result.max(skipna=True):
             BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
-            debug.append(result.max(skipna=True))
+            rreturnLog.append(result.max(skipna=True))
             BestReturn = result.max(skipna=True)
         Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     #Apply best individual to test section then record total asset.
-    print(debug)
+    print(rreturnLog)
     flogic = fuzzy.FuzzyLogic(y3, y4,parsed)
     Collection = BestIndividual
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
