@@ -82,6 +82,8 @@ class FuzzyLogic:
 
     def ComputeQuadraticFunction(self, neighbourBucket, selfBucket, x):
         diffSquared = (neighbourBucket - selfBucket)**2
+        if (diffSquared == 0):
+            diffSquared = 0.00001
         a = -1.0 / diffSquared
         b = (x - selfBucket)**2
         y = (a * b) + 1
@@ -193,35 +195,26 @@ class FuzzyLogic:
 
 
 
-#
-#
-#data = pd.read_excel('data/dummy.xlsx')
-#trainingStart= 5000
-#traningEnd = 12000
-#floglic = FuzzyLogic(trainingStart, traningEnd,data)
-#clusterFuzzy = FuzzyLogic(trainingStart, traningEnd,data, True)
-#
-#floglic.PlotGraph(1, 200, 10)
+print ("Test")
+
+
+data = pd.read_excel('data/dummy.xlsx')
+trainingStart= 5000
+traningEnd = 12000
+floglic = FuzzyLogic(trainingStart, traningEnd,data)
+floglic.PlotGraph(1, 200, 10)
+floglic = FuzzyLogic(trainingStart, traningEnd,data, True)
+floglic.PlotGraph(1, 200, 10)
+
+
 #for i in range(-150, 100):  
 #    print (floglic.ComputeMembership( i,200,10,1,0)) # value, m, n, MA_Type, bucket
 #   
 #for i in range(-150, 100):  
 #    print (floglic.ComputeMembership( i,200,10,1,4)) # value, m, n, MA_Type, bucket
 #    
-#for i in range(-150, 100):  
-#    print (floglic.ComputeMembership( i,200,10,1,6)) # value, m, n, MA_Type, bucket
+
     
-#
-#clusterFuzzy = FuzzyLogic(trainingStart, traningEnd,data, True)
-#
-#
-#clusterFuzzy.PlotGraph(1, 200, 10)
-#for i in range(-150, 100):  
-#    print (clusterFuzzy.ComputeMembership( i,200,10,1,1)) # value, m, n, MA_Type, bucket
-
-
-
-
 
 
 
