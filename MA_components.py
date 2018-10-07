@@ -1,64 +1,56 @@
+##---------------- Memo Table ----------------------------##
 
-import sys
+memo={'sma':{},
+      'tma':{},
+      'tpma':{},
+      'ama':{}}
+
 ##----------------- Helper Functions-----------------------##
 
-def smafunc(startindex, endindex, period, df):
+def smafunc(period, lst):
     
-    lst = list(df[startindex:endindex])
-    sma = []
     count = 0
-
-    while count + period <= endindex-startindex:
-        start = count
-        end = count + period
-        sma += [sum(lst[start:end])/period,]
-        count += 1
-        
-    return sma       
-        
-def tmafunc(startindex, endindex, period, df):
+    memo['sma'][period] = []
     
-    if startindex < period:
-        new_startindex = 0
-    else:
-        new_startindex = startindex - period + 1
-
-    lst = smafunc(new_startindex, endindex, period, df)
-    tma= []
-    count = 0
-
     while count + period <= len(lst):
         start = count
         end = count + period
-        tma += [sum(lst[start:end])/period,]
+        memo['sma'][period] += [sum(lst[start:end])/period,]
         count += 1
+
         
-    return tma
+def tmafunc(period):
 
-def tpmafunc(startindex, endindex, period, df):
+    lst = memo['sma'][period]
+    count = 0
+    memo['tma'][period] = []
+    
+    while count + period <= len(lst):
+        start = count
+        end = count + period
+        memo['tma'][period] += [sum(lst[start:end])/period,]
+        count += 1
 
-    lst = list(df[startindex:endindex])
-    tpma = []
+def tpmafunc(period, lst):
+    
+    memo['tpma'][period] = []
     count = 0
 
-    while count + period <= endindex - startindex:
+    while count + period <= len(lst):
         start = count
         end = count + period
         temp_lst = list(lst[start:end])
         max_price = max(temp_lst)
         min_price = min(temp_lst)
         close_price = temp_lst[0]
-        tpma += [(max_price + min_price + close_price)/3,]
+        memo['tpma'][period] += [(max_price + min_price + close_price)/3,]
         count += 1
-        
-    return tpma
 
-def amafunc(startindex, endindex, period, df):
+def amafunc(period, lst):
     
-    lst = list(df[startindex:endindex])
     ini_ama = sum(lst[:period])/period
         
-    ama = [ini_ama,]
+    memo['ama'][period] = [ini_ama,]
     fastSC = 2/(1 + 2)
     slowSC = 2/(1 + 30)
 
@@ -66,7 +58,7 @@ def amafunc(startindex, endindex, period, df):
     k_n = 1
     k = 1
 
-    while k_1 < endindex-startindex:
+    while k_1 < len(lst):
         signal = abs(lst[k_1] - lst[k_n])
         i = k_n
         noise = 0
@@ -81,12 +73,12 @@ def amafunc(startindex, endindex, period, df):
             ER_k = signal / noise
             
         SSC_k = ER_k * (fastSC - slowSC) + slowSC
-        ama += [ama[k - 1] + (SSC_k**2)*(lst[k - 1]-ama[k - 1]),]
+        ama_k_1 = memo['ama'][period][k - 1] 
+        memo['ama'][period] += [ama_k_1 + (SSC_k**2)*(lst[k - 1]-ama_k_1),]
         k_1 += 1
         k_n += 1
         k += 1
 
-    return ama
 
 ##-------------------------------------------------------------##
 
@@ -94,23 +86,30 @@ def amafunc(startindex, endindex, period, df):
 
 def computeMA(typeMA, startindex, endindex, period, df):
 
-    tempDf = df['Close']
-    
-    if startindex <= period:
-        new_startindex = 0
-    else:
-        new_startindex = startindex - period
-
+    if memo['sma']== {}:
+        initialisation(list(df['Close']))
+        
     if typeMA == 0:
-        return smafunc(new_startindex, endindex, period, tempDf)
+        return memo['sma'][period][startindex:endindex+1]
     elif typeMA == 1:
-        return tmafunc(new_startindex, endindex, period, tempDf)
+        return memo['tma'][period][startindex:endindex+1]
     elif typeMA == 2:
-        return tpmafunc(new_startindex, endindex, period, tempDf)
+        return memo['tpma'][period][startindex:endindex+1]
     elif typeMA == 3:
-        return amafunc(new_startindex, endindex, period, tempDf)
+        return memo['ama'][period][startindex:endindex+1]
     else:
         return []
+    
+# initialised the computation for memo table
+def initialisation(lst):
+    mn = [1,3,5,10,15,20,50,100,150,200]
+    
+    for ele in mn:
+        smafunc(ele,lst)
+        tmafunc(ele)
+        tpmafunc(ele,lst)
+        amafunc(ele,lst)
+        
 
 ## Test Cases
 #print(smafunc(0, 10, 5))
