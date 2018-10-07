@@ -177,7 +177,7 @@ class FuzzyLogic:
                 membershipdegree = self.ComputeQuadraticFunction(CIntervalues[1], CIntervalues[0], value)     
                 
         elif (bucket == 6): #p7
-            if (value >  self.bucketArray[6]):
+            if (value >  CIntervalues[6]):
                 membershipdegree = 1.0      
             elif ((self.CheckIfInRange(CIntervalues[5], CIntervalues[6], value)) == True): #leftside
                 membershipdegree = self.ComputeQuadraticFunction(CIntervalues[5], CIntervalues[6], value)
@@ -199,13 +199,18 @@ class FuzzyLogic:
 #trainingStart= 5000
 #traningEnd = 12000
 #floglic = FuzzyLogic(trainingStart, traningEnd,data)
-#
+#clusterFuzzy = FuzzyLogic(trainingStart, traningEnd,data, True)
 #
 #floglic.PlotGraph(1, 200, 10)
 #for i in range(-150, 100):  
-#    print (floglic.ComputeMembership( i,200,10,1,1)) # value, m, n, MA_Type, bucket
+#    print (floglic.ComputeMembership( i,200,10,1,0)) # value, m, n, MA_Type, bucket
+#   
+#for i in range(-150, 100):  
+#    print (floglic.ComputeMembership( i,200,10,1,4)) # value, m, n, MA_Type, bucket
 #    
-#
+#for i in range(-150, 100):  
+#    print (floglic.ComputeMembership( i,200,10,1,6)) # value, m, n, MA_Type, bucket
+    
 #
 #clusterFuzzy = FuzzyLogic(trainingStart, traningEnd,data, True)
 #
