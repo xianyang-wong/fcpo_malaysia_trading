@@ -195,16 +195,16 @@ class FuzzyLogic:
 
 
 
-print ("Test")
+#print ("Test")
 
 
-data = pd.read_excel('data/dummy.xlsx')
-trainingStart= 5000
-traningEnd = 12000
-floglic = FuzzyLogic(trainingStart, traningEnd,data)
-floglic.PlotGraph(1, 200, 10)
-floglic = FuzzyLogic(trainingStart, traningEnd,data, True)
-floglic.PlotGraph(1, 200, 10)
+#data = pd.read_excel('data/dummy.xlsx')
+#trainingStart= 5000
+#traningEnd = 12000
+#floglic = FuzzyLogic(trainingStart, traningEnd,data)
+#floglic.PlotGraph(1, 200, 10)
+#floglic = FuzzyLogic(trainingStart, traningEnd,data, True)
+#floglic.PlotGraph(1, 200, 10)
 
 
 #for i in range(-150, 100):  

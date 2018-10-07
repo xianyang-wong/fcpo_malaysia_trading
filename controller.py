@@ -10,6 +10,8 @@ import genetic_algo
 import pandas as pd
 import os
 import datetime
+import Fuzzy_Logic as fuzzy
+
 
 directory = ''
 parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
@@ -19,7 +21,7 @@ parsedByDay = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed
 GA_Iterations=51
 # Num_of_groups=69
 
-dfType = 2 # run datafile by day
+dfType = 1 # run datafile by day
 if dfType == 1:
     Num_of_groups = 69
 elif dfType == 2:
@@ -54,19 +56,20 @@ for i in range (0,groupLength):
     print('Sub Group Index 2: '+ str(y2))
     print('Sub Group Index 3: '+ str(y3))
     print('Sub Group Index 4: '+ str(y4))
-
     
     #Apply first random rule on training section
-    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection)
+    flogic = fuzzy.FuzzyLogic(y1, y3,parsed)
+    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic)
     result = FF.getRreturn()
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     BestReturn=-101
     BestIndividual=[[]]
     debug=[]
+    flogic = fuzzy.FuzzyLogic(y2, y3,parsed)
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
-        #print("GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection)
+        print("GA iteration ",j)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic)
         result = FF.getRreturn()
         #print(result)
         if BestReturn < result.max(skipna=True):
@@ -76,7 +79,8 @@ for i in range (0,groupLength):
         Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     #Apply best individual to test section then record total asset.
     print(debug)
+    flogic = fuzzy.FuzzyLogic(y3, y4,parsed)
     Collection = BestIndividual
-    FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection)
+    FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
     FF.getTotalAsset()
     print("End of group ",i,datetime.datetime.now())

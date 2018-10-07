@@ -1,5 +1,4 @@
 import pandas as pd
-import Fuzzy_Logic as fuzzy
 import MA_components as maComp
 import numpy as np
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
@@ -27,12 +26,12 @@ class FitnessFunction:
         else:
             return sum(list)/len(list)
 
-    def __init__(self,s0,s1,df,Collection):
+    def __init__(self,s0,s1,df,Collection,flogic):
+        self.fuzzylogic=flogic
         self.DfFitness = pd.DataFrame(np.array([1000000.0,0,0,0,0,0]*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
-        floglic = fuzzy.FuzzyLogic(self.StartIndex, self.EndIndex,df)
         
         for index in range(self.StartIndex, self.EndIndex):
             if df.Flag[index] == 1:
@@ -43,7 +42,7 @@ class FitnessFunction:
                 tmpList=[]
                 for rule in ruleSet:
                     MAd = self.MA_Diff(rule[0],rule[1][1],rule[1][0],index,df)
-                    recommandValue = floglic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0]),int(rule[2]))
+                    recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0]),int(rule[2]))
                     if recommandValue >= 0:
                         tmpList.append(recommandValue* rule[3])
                 rlevelList.append(self.Average(tmpList))
@@ -92,4 +91,5 @@ class FitnessFunction:
         return ((self.DfFitness.profit  - self.DfFitness.cost)/self.InitialCapital)
     
     def getTotalAsset(self):
-        print(self.InitialCapital + self.DfFitness.profit - self.DfFitness.cost )
+        totalAsset= self.InitialCapital + self.DfFitness.profit - self.DfFitness.cost
+        print("Total asset is :",totalAsset[0])
