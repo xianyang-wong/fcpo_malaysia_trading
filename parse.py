@@ -46,7 +46,7 @@ parsed.describe()
 # plt.show()
 
 
-parsed['Date'] = pd.to_datetime(parsed['Date'],format='%Y%m%d') #将数据类型转换为日期类型
+parsed['Date'] = pd.to_datetime(parsed['Date'],format='%Y%m%d')
 parsed['Date'] = parsed['Date'].dt.date
 
 parsed['Time'] = pd.to_datetime(parsed['Time'],format='%H:%M:%S')
