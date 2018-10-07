@@ -42,8 +42,8 @@ parsed = parse_futures_data(data, ['Open','High','Low','Close','Volume'])
 
 parsed.describe()
 
-# plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
-# plt.show()
+plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
+plt.show()
 
 
 parsed['Date'] = pd.to_datetime(parsed['Date'],format='%Y%m%d')
@@ -53,14 +53,29 @@ parsed['Time'] = pd.to_datetime(parsed['Time'],format='%H:%M:%S')
 parsed['Time'] = parsed['Time'].dt.time
 
 parsed['Flag'] = parsed['Date'].diff()
-parsed.loc[parsed.Date == parsed.Date.shift(-1), 'Flag'] = 0 # 0 for same day
+parsed.loc[parsed.Date == parsed.Date.shift(-1), 'Flag'] = 0 # 0 for default
 parsed.loc[parsed.Date != parsed.Date.shift(), 'Flag'] = 1 # 1 for opening price
 parsed.loc[parsed.Date != parsed.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
 parsed['Datetime'] = pd.to_datetime(parsed['Date'].astype(str) + ' ' + parsed['Time'].astype(str))
 
-parsed = parsed[['Datetime','Date','Time','Open','High','Low','Close','Volume','Flag']]
+parsed['HourTime'] = parsed['Time'].astype(str)
+parsed['HourTime'] = parsed['HourTime'].str.replace(':','')
+parsed['Hour_Minute'] = parsed['HourTime'].str[:4]
+parsed['Hour'] = parsed['HourTime'].str[:2]
+parsed['Minute'] = parsed['HourTime'].str[2:4]
+parsed.loc[(parsed.Minute.str.contains('00')), 'Flag'] = 3 # 3 for first entry for one hour
+parsed.loc[(parsed.Hour != parsed.Hour.shift(-1)) & (parsed.Date == parsed.Date.shift(-1)), 'Flag'] = 4 # 4 for last entry for one hour
+
 parsedByDay = parsed.loc[parsed.Flag != 0]
 parsedByDay = parsedByDay.reset_index(drop=True)
+
+parsed = parsed[['Datetime','Date','Time','Open','High','Low','Close','Volume','Flag']]
+
+parsedByDay = parsed.loc[(parsed.Flag == 1) | (parsed.Flag == 2)]
+parsedByDay = parsedByDay.reset_index(drop=True)
+parsedByHour = parsed.loc[(parsed.Flag == 3) | (parsed.Flag == 4)]
+parsedByHour = parsedByHour.reset_index(drop=True)
+
 
 def saveDf (df,dfType):
         writer = pd.ExcelWriter(os.path.join(directory,'data/FCPO_6_years_NUS_'+ dfType +'.xlsx'), engine='xlsxwriter')
@@ -70,4 +85,5 @@ def saveDf (df,dfType):
 
 saveDf(parsed,'Parsed')
 saveDf(parsedByDay,'ParsedByDay')
+saveDf(parsedByHour,'ParsedByHour')
 
