@@ -49,7 +49,7 @@ for i in range (0,groupLength):
 
     
     #Apply first random rule on training section
-    FF =FitnessFunction.FitnessFunction(y1,y2,parsed,Collection)
+    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection)
     result = FF.getRreturn()
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     BestReturn=-101
@@ -58,7 +58,7 @@ for i in range (0,groupLength):
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         #print("GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection)
         result = FF.getRreturn()
         #print(result)
         if BestReturn < result.max(skipna=True):
