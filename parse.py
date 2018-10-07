@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-directory = '/Users/qingtao/OneDrive - National University of Singapore/MTech/01 KE5207/computational intelligence ii/CA/fcpo_malaysia_trading/'
+directory = '/Users/qingtao/OneDrive - National University of Singapore/MTech/02 KE5207/computational intelligence ii/CA/fcpo_malaysia_trading/'
 data = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS.xlsx'))
 data.columns = data.columns.str.strip()
 
@@ -45,11 +45,22 @@ parsed.describe()
 # plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
 # plt.show()
 
-data['Flag'] = data['Date'].diff()
-data.loc[data.Date != data.Date.shift(-1), 'Flag'] = 2 # 2=closing time
-data.loc[data['Flag']>2,'Flag']=1 # 1=opening time
+# data['Flag'] = data['Date'].diff()
+# data.loc[data.Date != data.Date.shift(-1), 'Flag'] = 2 # 2=closing time
+# data.loc[data['Flag']>2,'Flag']=1 # 1=opening time
+parsed['Date'] = pd.to_datetime(parsed['Date'],format='%Y%m%d') #将数据类型转换为日期类型
+parsed['Date'] = parsed['Date'].dt.date
+
+parsed['Time'] = pd.to_datetime(parsed['Time'],format='%H:%M:%S')
+parsed['Time'] = parsed['Time'].dt.time
+
+parsed['Flag'] = parsed['Date'].diff()
+parsed.loc[parsed.Date == parsed.Date.shift(-1), 'Flag'] = 0 # 0 for same day
+parsed.loc[parsed.Date != parsed.Date.shift(), 'Flag'] = 1 # 1 for opening price
+parsed.loc[parsed.Date != parsed.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
+parsed['Datetime'] = pd.to_datetime(parsed['Date'].astype(str) + ' ' + parsed['Time'].astype(str))
 
 out_path = directory
 writer = pd.ExcelWriter(os.path.join(directory,'data/FCPO_6_years_NUS'+ '_Parsed' +'.xlsx'))
-data.to_excel(writer)
+parsed.to_excel(writer)
 writer.save()    
