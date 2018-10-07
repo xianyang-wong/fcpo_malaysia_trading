@@ -45,9 +45,7 @@ parsed.describe()
 # plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
 # plt.show()
 
-# data['Flag'] = data['Date'].diff()
-# data.loc[data.Date != data.Date.shift(-1), 'Flag'] = 2 # 2=closing time
-# data.loc[data['Flag']>2,'Flag']=1 # 1=opening time
+
 parsed['Date'] = pd.to_datetime(parsed['Date'],format='%Y%m%d') #将数据类型转换为日期类型
 parsed['Date'] = parsed['Date'].dt.date
 
@@ -60,7 +58,16 @@ parsed.loc[parsed.Date != parsed.Date.shift(), 'Flag'] = 1 # 1 for opening price
 parsed.loc[parsed.Date != parsed.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
 parsed['Datetime'] = pd.to_datetime(parsed['Date'].astype(str) + ' ' + parsed['Time'].astype(str))
 
-out_path = directory
-writer = pd.ExcelWriter(os.path.join(directory,'data/FCPO_6_years_NUS'+ '_Parsed' +'.xlsx'))
-parsed.to_excel(writer)
-writer.save()    
+parsed = parsed[['Datetime','Date','Time','Open','High','Low','Close','Volume','Flag']]
+parsedByDay = parsed.loc[parsed.Flag != 0]
+parsedByDay = parsedByDay.reset_index(drop=True)
+
+def saveDf (df,dfType):
+        writer = pd.ExcelWriter(os.path.join(directory,'data/FCPO_6_years_NUS_'+ dfType +'.xlsx'), engine='xlsxwriter')
+        df.to_excel(writer)
+        writer.save()
+
+
+saveDf(parsed,'Parsed')
+saveDf(parsedByDay,'ParsedByDay')
+
