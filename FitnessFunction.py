@@ -72,13 +72,13 @@ class FitnessFunction:
                         TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.profit[IndividualCount]+ df.Low[index] * HoldingDiff
                     #calculate Cost
                     TmpDfFitness.iloc[IndividualCount]['cost'] =  abs(HoldingDiff) * df.Low[index] * 0.002  
-            TmpDfFitness['deposit'] = abs(self.DfFitness['holding']) * df.High[index] * self.Deposit
+            TmpDfFitness['deposit'] = abs(TmpDfFitness['holding']) * df.High[index] * self.Deposit
             #calculate deposit
             TmpDfFitness['cost'] = TmpDfFitness[['cost', 'MinCost']].max(axis=1)
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
             for IndividualCount in range(0,20):#do not trade if no capital
-                if self.InitialCapital - TmpDfFitness.deposit[IndividualCount] < 0:
+                if self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0:
                     #print("No money on individual %d",IndividualCount)
                     TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]
@@ -93,3 +93,4 @@ class FitnessFunction:
     def getTotalAsset(self):
         totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost
         print("Total asset is :",totalAsset[0])
+        print(self.DfFitness)
