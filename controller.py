@@ -14,23 +14,24 @@ import Fuzzy_Logic as fuzzy
 
 
 directory = ''
-parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
-parsedByDay = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
 
 #configuration parameters.
 GA_Iterations=51
-# Num_of_groups=69
 
-dfType = 2 # 1: run datafile by min   2:run datafile by day
+dfType = 3 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
-    Num_of_groups = 69
+    num_of_groups = 69
+    parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
 elif dfType == 2:
-    Num_of_groups = 50
-    parsed = parsedByDay
+    num_of_groups = 3
+    parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
+elif dfType == 3:
+    num_of_groups = 14
+    parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))    
 
 print('--------------')
 print(len(parsed))
-groupSize = int(len(parsed)/Num_of_groups)
+groupSize = int(len(parsed)/num_of_groups)
 subGroupSize = int(groupSize/4)
 groupLength = int(len(parsed)/subGroupSize) - 3
 print(groupSize)
@@ -84,3 +85,4 @@ for i in range (0,groupLength):
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
     FF.getTotalAsset()
     print("End of group ",i,datetime.datetime.now())
+    
