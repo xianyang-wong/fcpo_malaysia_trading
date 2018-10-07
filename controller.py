@@ -9,14 +9,18 @@ import FitnessFunction
 import genetic_algo
 import pandas as pd
 import os
-
+import datetime
 
 directory = ''
 parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
 
+#configuration parameters.
+GA_Iterations=51
+Num_of_groups=69
+
 print('--------------')
 print(len(parsed))
-groupSize = int(len(parsed)/69)
+groupSize = int(len(parsed)/Num_of_groups)
 subGroupSize = int(groupSize/4)
 groupLength = int(len(parsed)/subGroupSize) - 3
 print(groupSize)
@@ -28,9 +32,9 @@ y2=0
 y3=0
 y4=0
 
-Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
-
 for i in range (0,groupLength):
+    Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
+    print("Begin of group ",i,datetime.datetime.now())
     print('Group: '+ str(i+1))
     y1 += subGroupSize
     # yTmp = y1 + subGroupSize
@@ -52,10 +56,11 @@ for i in range (0,groupLength):
     BestIndividual=[[]]
     debug=[]
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
-    for j in range(0,51):#some code to keep track of the best individual!!!!
+    for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
+        #print("GA iteration ",j)
         FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection)
         result = FF.getRreturn()
-        print(result)
+        #print(result)
         if BestReturn < result.max(skipna=True):
             BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
             debug.append(result.max(skipna=True))
@@ -66,3 +71,4 @@ for i in range (0,groupLength):
     Collection = BestIndividual
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection)
     FF.getTotalAsset()
+    print("End of group ",i,datetime.datetime.now())
