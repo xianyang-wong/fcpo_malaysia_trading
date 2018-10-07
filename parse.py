@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-directory = '/Users/qingtao/OneDrive - National University of Singapore/MTech/02 KE5207/computational intelligence ii/CA/fcpo_malaysia_trading/'
+directory = ''
 data = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS.xlsx'))
 data.columns = data.columns.str.strip()
 
