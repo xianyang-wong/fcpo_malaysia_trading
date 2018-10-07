@@ -13,10 +13,18 @@ import datetime
 
 directory = ''
 parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
+parsedByDay = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
 
 #configuration parameters.
 GA_Iterations=51
-Num_of_groups=69
+# Num_of_groups=69
+
+dfType = 2 # run datafile by day
+if dfType == 1:
+    Num_of_groups = 69
+elif dfType == 2:
+    Num_of_groups = 50
+    parsed = parsedByDay
 
 print('--------------')
 print(len(parsed))
