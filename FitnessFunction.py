@@ -98,3 +98,5 @@ class FitnessFunction:
         totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost
         print("Total asset is :",totalAsset[0])
         print(self.DfFitness)
+        return totalAsset[0]
+       

@@ -83,6 +83,6 @@ for i in range (0,groupLength):
     flogic = fuzzy.FuzzyLogic(y3, y4,parsed)
     Collection = BestIndividual
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
-    FF.getTotalAsset()
+    totalAsset = FF.getTotalAsset()
     print("End of group ",i,datetime.datetime.now())
     
