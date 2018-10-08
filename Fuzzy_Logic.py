@@ -28,8 +28,7 @@ class FuzzyLogic:
         self.trainingLength = trainindPeriodEnd - trainingPeriodStart
         self.ComputeMovingAverageForYear(trainingPeriodStart, trainindPeriodEnd, dataframe, cluster)
       
-         
-        
+            
     def RetriveDiffInValue(self,MAType, m, n):
         myKey = "%s %s %s" % (int(MAType),int(m), int(n))
         return self.permuationDict[myKey]
@@ -43,7 +42,10 @@ class FuzzyLogic:
                         mValues = maComp.computeMA(MAType, (startIndex), endIndex, Lma, df)
                         nValues = maComp.computeMA(MAType, (startIndex), endIndex, Sma, df)
 
-        
+                        if (len(mValues) != len(nValues)):
+                            print("TO TAKE NOT!!! MA_TYpe " , MAType, "M values ", Lma,  "N values ", Sma)
+                            continue
+                        
                         v =  np.subtract(mValues, nValues)
                         sortedArray =  np.sort(v)
                      
@@ -198,13 +200,16 @@ class FuzzyLogic:
 #print ("Test")
 
 
-#data = pd.read_excel('data/dummy.xlsx')
-#trainingStart= 5000
-#traningEnd = 12000
-#floglic = FuzzyLogic(trainingStart, traningEnd,data)
-#floglic.PlotGraph(1, 200, 10)
-#floglic = FuzzyLogic(trainingStart, traningEnd,data, True)
-#floglic.PlotGraph(1, 200, 10)
+data = pd.read_excel('data/dummy.xlsx')
+trainingStart= 5000
+traningEnd = 12000
+floglic = FuzzyLogic(trainingStart, traningEnd,data)
+floglic.PlotGraph(1, 200, 10)
+floglic = FuzzyLogic(trainingStart, traningEnd,data, True)
+floglic.PlotGraph(1, 200, 10)
+
+testvalue = 200
+print("MA_TYpe " , testvalue)
 
 
 #for i in range(-150, 100):  
