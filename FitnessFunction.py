@@ -31,27 +31,31 @@ class FitnessFunction:
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
+        self.LastMA=pd.DataFrame([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,])
         
         for index in range(self.StartIndex, self.EndIndex):
             if df.Flag[index] == 1:
                 self.DailyFirstIndex = index
              #calculate rlevel for each individual,20 in total
             rlevelList=[]
-            LastRlevel=pd.DataFrame([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+            MA_List=[]
             for ruleSet in Collection:
                 tmpList=[]
+                tmpMA=[]
                 for rule in ruleSet:#rule:{a,b,c,d,e} a:MA 0-3 ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
                     MAd = self.MA_Diff(rule[0],rule[1][1],rule[1][0],index,df)
                     recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0]),int(rule[2]))
                     if recommandValue >= 0:#result will not be taken into account if recommandValue below 0
                         tmpList.append(recommandValue* rule[3])
+                        tmpMA.append(MAd)
                 rlevelList.append(self.Average(tmpList))
+                MA_List.append(self.Average(tmpMA))
             self.DfRlevel = pd.DataFrame(rlevelList)#Dataframe that stores rlevel values for all 20 individuals
+            self.CrossFlag = pd.DataFrame(MA_List) * self.LastMA
+            self.LastMA = pd.DataFrame(MA_List)
             
             
-            
-            
-            TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
+            TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30,]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
             #Dataframe stores valeus to calculate fitness function at current moment.
 
             #Calculate Holding,if reaching the end of session, sell all holdings to cash out.
@@ -82,7 +86,7 @@ class FitnessFunction:
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
             for IndividualCount in range(0,20):#do not trade if no capital
-                if self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0:
+                if (self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) || (self.CrossFlag[IndividualCount] > 0):
                     #print("No money on individual %d",IndividualCount)
                     TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]

@@ -66,7 +66,6 @@ for i in range (0,groupLength):
     BestReturn=-10
     BestIndividual=[[]]
     rreturnLog=[]
-    flogic = fuzzy.FuzzyLogic(y2, y3,parsed)
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         print("GA iteration ",j)
@@ -80,7 +79,6 @@ for i in range (0,groupLength):
         Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     #Apply best individual to test section then record total asset.
     print(rreturnLog)
-    flogic = fuzzy.FuzzyLogic(y3, y4,parsed)
     Collection = BestIndividual
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
     totalAsset = FF.getTotalAsset()
