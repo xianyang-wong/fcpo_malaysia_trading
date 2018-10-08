@@ -4,7 +4,6 @@ import numpy as np
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
 class FitnessFunction:
-    #rule:{a,b,c,d,e} a:MA 0-3 ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
     InitialCapital=1000000
     #initial capital
    
@@ -17,7 +16,7 @@ class FitnessFunction:
     def MA_Diff(self,MAType,m,n,index,df):#SMA as demo
         mValues = maComp.computeMA(MAType, int(index), int(index), int(m), df)
         nValues = maComp.computeMA(MAType, int(index), int(index), int(n), df)
-        v =  np.subtract(mValues, nValues)
+        v =  np.subtract(nValues,mValues)
         return v[0]
 
     def Average(self,list):
@@ -38,17 +37,22 @@ class FitnessFunction:
                 self.DailyFirstIndex = index
              #calculate rlevel for each individual,20 in total
             rlevelList=[]
+            LastRlevel=pd.DataFrame([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
             for ruleSet in Collection:
                 tmpList=[]
-                for rule in ruleSet:
+                for rule in ruleSet:#rule:{a,b,c,d,e} a:MA 0-3 ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
                     MAd = self.MA_Diff(rule[0],rule[1][1],rule[1][0],index,df)
                     recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0]),int(rule[2]))
-                    if recommandValue >= 0:
+                    if recommandValue >= 0:#result will not be taken into account if recommandValue below 0
                         tmpList.append(recommandValue* rule[3])
                 rlevelList.append(self.Average(tmpList))
-            self.DfRlevel = pd.DataFrame(rlevelList)
+            self.DfRlevel = pd.DataFrame(rlevelList)#Dataframe that stores rlevel values for all 20 individuals
+            
+            
+            
+            
             TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
-            #store buffer
+            #Dataframe stores valeus to calculate fitness function at current moment.
 
             #Calculate Holding,if reaching the end of session, sell all holdings to cash out.
             if index != self.EndIndex-1:
