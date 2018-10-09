@@ -31,7 +31,8 @@ class FitnessFunction:
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
-        self.LastMA=pd.DataFrame([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,])
+        self.LastMA=pd.DataFrame([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        self.CrossFlag=[]
         
         for index in range(self.StartIndex, self.EndIndex):
             if df.Flag[index] == 1:
@@ -47,13 +48,13 @@ class FitnessFunction:
                     recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0]),int(rule[2]))
                     if recommandValue >= 0:#result will not be taken into account if recommandValue below 0
                         tmpList.append(recommandValue* rule[3])
-                        tmpMA.append(MAd)
+                    tmpMA.append(MAd)
                 rlevelList.append(self.Average(tmpList))
                 MA_List.append(self.Average(tmpMA))
             self.DfRlevel = pd.DataFrame(rlevelList)#Dataframe that stores rlevel values for all 20 individuals
-            self.CrossFlag = pd.DataFrame(MA_List) * self.LastMA
+            self.CrossFlag = (pd.DataFrame(MA_List) * self.LastMA)[0].tolist()
             self.LastMA = pd.DataFrame(MA_List)
-            
+            self.CrossFlag += [0] * (20 - len(self.CrossFlag))
             
             TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30,]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
             #Dataframe stores valeus to calculate fitness function at current moment.
@@ -86,7 +87,7 @@ class FitnessFunction:
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
             for IndividualCount in range(0,20):#do not trade if no capital
-                if (self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) || (self.CrossFlag[IndividualCount] > 0):
+                if (self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) or (self.CrossFlag[IndividualCount] > 0):
                     #print("No money on individual %d",IndividualCount)
                     TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]
@@ -103,4 +104,3 @@ class FitnessFunction:
         print("Total asset is :",totalAsset[0])
         print(self.DfFitness)
         return totalAsset[0]
-       

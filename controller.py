@@ -45,7 +45,7 @@ y4=0
 
 for i in range (0,groupLength):
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
-    print("Begin of group ",i,datetime.datetime.now())
+    print("Begin of group ",i+1,datetime.datetime.now())
     print('Group: '+ str(i+1))
     y1 += subGroupSize
     # yTmp = y1 + subGroupSize
@@ -82,5 +82,5 @@ for i in range (0,groupLength):
     Collection = BestIndividual
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
     totalAsset = FF.getTotalAsset()
-    print("End of group ",i,datetime.datetime.now())
+    print("End of group ",i+1,datetime.datetime.now())
     
