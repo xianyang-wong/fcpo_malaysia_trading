@@ -87,8 +87,8 @@ class FitnessFunction:
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
             for IndividualCount in range(0,20):#do not trade if no capital
-                if (self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) or (self.CrossFlag[IndividualCount] > 0):
-                    #print("No money on individual %d",IndividualCount)
+                if ((self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) or (self.CrossFlag[IndividualCount] > 0)) and (index != self.EndIndex-1):
+                    #print("No money on individual ",IndividualCount)
                     TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]
             if df.Flag[index] == 2:# clear daily holding profit

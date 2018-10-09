@@ -18,7 +18,7 @@ directory = ''
 #configuration parameters.
 GA_Iterations=51
 
-dfType = 3 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
+dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
     num_of_groups = 69
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
@@ -58,7 +58,7 @@ for i in range (0,groupLength):
     print('End of testing SubGroup: '+ str(y4))
     
     #Apply first random rule on training section
-    flogic = fuzzy.FuzzyLogic(y1, y3,parsed)
+    flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic)
     result = FF.getRreturn()
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
