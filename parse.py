@@ -42,8 +42,8 @@ parsed = parse_futures_data(data, ['Open','High','Low','Close','Volume'])
 
 parsed.describe()
 
-plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
-plt.show()
+# plots = parsed[['Close', 'Volume']].plot(subplots=True, figsize=(10, 10))
+# plt.show()
 
 
 parsed['Date'] = pd.to_datetime(parsed['Date'],format='%Y%m%d')
@@ -71,9 +71,12 @@ parsedByDay = parsedByDay.reset_index(drop=True)
 
 parsed = parsed[['Datetime','Date','Time','Open','High','Low','Close','Volume','Flag']]
 
-parsedByDay = parsed.loc[(parsed.Flag == 1) | (parsed.Flag == 2)]
+parsedByDay = parsed.loc[(parsed.Flag == 1) | (parsed.Flag == 2)].copy()
 parsedByDay = parsedByDay.reset_index(drop=True)
-parsedByHour = parsed.loc[(parsed.Flag == 3) | (parsed.Flag == 4)]
+parsedByHour = parsed.loc[(parsed.Flag == 3) | (parsed.Flag == 4) | (parsed.Flag == 1) | (parsed.Flag == 2)].copy()
+parsedByHour.loc[parsedByHour.Date == parsedByHour.Date.shift(-1), 'Flag'] = 0 # 0 for rest
+parsedByHour.loc[parsedByHour.Date != parsedByHour.Date.shift(), 'Flag'] = 1 # 1 for opening price
+parsedByHour.loc[parsedByHour.Date != parsedByHour.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
 parsedByHour = parsedByHour.reset_index(drop=True)
 
 
