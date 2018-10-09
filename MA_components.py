@@ -92,7 +92,10 @@ def computeMA(typeMA, startindex, endindex, period, df):
     if typeMA == 0:
         return memo['sma'][period][startindex:endindex+1]
     elif typeMA == 1:
-        return memo['tma'][period][startindex:endindex+1]
+        if startindex <= period:
+            return memo['tma'][period][startindex:endindex+1]
+        else:
+            return memo['tma'][period][startindex-period:endindex+1-period]
     elif typeMA == 2:
         return memo['tpma'][period][startindex:endindex+1]
     elif typeMA == 3:
