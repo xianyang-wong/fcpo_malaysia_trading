@@ -26,7 +26,7 @@ elif dfType == 2:
     num_of_groups = 3
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
 elif dfType == 3:
-    num_of_groups = 14
+    num_of_groups = 17
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))    
 
 print('--------------')
