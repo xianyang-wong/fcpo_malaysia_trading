@@ -13,25 +13,25 @@ import MA_components as maComp
 import time
 
 ##data = pd.read_excel('data/dummy.xlsx')
-data = pd.read_excel('data/FCPO_6_years_NUS.xlsx')
+data = pd.read_excel('data/FCPO_6_years_NUS_ParsedByDay.xlsx')
 print("Start testing")
 
 
-trainingStart= 5000
-traningEnd = 7000
-M = 10
-N = 1
+trainingStart= 2205
+traningEnd = 2695
+M = 150
+N = 200
 
 print ("test")
 start_time = time.time()
-mValues = maComp.computeMA(0, trainingStart, traningEnd, M, data)
+mValues = maComp.computeMA(1, trainingStart, traningEnd, M, data)
 print (len(mValues))
 print("mruntime: --- %s seconds ---" % (time.time() - start_time))
 
 ##print (data[195:200])
 #
 start_time = time.time()
-nValues = maComp.computeMA(0, trainingStart, traningEnd, N, data)
+nValues = maComp.computeMA(1, trainingStart, traningEnd, N, data)
 print (len(nValues))
 print("nruntime: --- %s seconds ---" % (time.time() - start_time))
 #
