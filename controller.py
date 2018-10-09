@@ -18,7 +18,7 @@ directory = ''
 #configuration parameters.
 GA_Iterations=51
 
-dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
+dfType = 3 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
     num_of_groups = 69
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
@@ -30,12 +30,12 @@ elif dfType == 3:
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))    
 
 print('--------------')
-print(len(parsed))
+print("Total number of indexes",len(parsed))
 groupSize = int(len(parsed)/num_of_groups)
 subGroupSize = int(groupSize/4)
 groupLength = int(len(parsed)/subGroupSize) - 3
-print(groupSize)
-print(subGroupSize)
+print("Group size",groupSize)
+print("SubGroup size",subGroupSize)
 print('--------------')
 
 y1=0
@@ -46,17 +46,16 @@ y4=0
 for i in range (0,groupLength):
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
     print("Begin of group ",i+1,datetime.datetime.now())
-    print('Group: '+ str(i+1))
     y1 += subGroupSize
     # yTmp = y1 + subGroupSize
     # y2 = yTmp + subGroupSize
     y2 = y1 + subGroupSize
     y3 = y2 + subGroupSize
     y4 = y3 + subGroupSize
-    print('Sub Group Index 1: '+ str(y1))
-    print('Sub Group Index 2: '+ str(y2))
-    print('Sub Group Index 3: '+ str(y3))
-    print('Sub Group Index 4: '+ str(y4))
+    print('Begin of training SubGroup: '+ str(y1))
+    print('Begin of select SubGroup: '+ str(y2))
+    print('Begin of testing SubGroup: '+ str(y3))
+    print('End of testing SubGroup: '+ str(y4))
     
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed)
