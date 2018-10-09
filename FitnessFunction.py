@@ -24,7 +24,7 @@ class FitnessFunction:
             return -1
         else:
             return sum(list)/len(list)
-
+        
     def __init__(self,s0,s1,df,Collection,flogic):
         self.fuzzylogic=flogic
         self.DfFitness = pd.DataFrame(np.array([1000000.0,0,0,0,0,0]*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
@@ -55,6 +55,7 @@ class FitnessFunction:
             self.CrossFlag = (pd.DataFrame(MA_List) * self.LastMA)[0].tolist()
             self.LastMA = pd.DataFrame(MA_List)
             self.CrossFlag += [0] * (20 - len(self.CrossFlag))
+            self.CrossFlag = np.sign(self.CrossFlag)
             
             TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30,]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
             #Dataframe stores valeus to calculate fitness function at current moment.
