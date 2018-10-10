@@ -18,7 +18,7 @@ directory = ''
 #configuration parameters.
 GA_Iterations=51
 
-dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
+dfType = 3 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
     num_of_groups = 69
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
@@ -46,7 +46,7 @@ y4=0
 for i in range (0,groupLength):
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
     print("Begin of group ",i+1,datetime.datetime.now())
-    y1 = subGroupSize*9
+    y1 += subGroupSize
     # yTmp = y1 + subGroupSize
     # y2 = yTmp + subGroupSize
     y2 = y1 + subGroupSize

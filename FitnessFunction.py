@@ -57,7 +57,7 @@ class FitnessFunction:
             self.CrossFlag += [0] * (20 - len(self.CrossFlag))
             self.CrossFlag = np.sign(self.CrossFlag)
             
-            TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30,]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
+            TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
             #Dataframe stores valeus to calculate fitness function at current moment.
 
             #Calculate Holding,if reaching the end of session, sell all holdings to cash out.
@@ -85,9 +85,11 @@ class FitnessFunction:
             TmpDfFitness['deposit'] = abs(TmpDfFitness['holding']) * df.High[index] * self.Deposit
             #calculate deposit
             TmpDfFitness['cost'] = TmpDfFitness[['cost', 'MinCost']].max(axis=1)
+            #calculate risk-free
+            TmpDfFitness['riskfree'] = self.DfFitness.riskfree
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
-            for IndividualCount in range(0,20):#do not trade if no capital
+            for IndividualCount in range(0,20):#do not trade if no capital or no intersection
                 if ((self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) or (self.CrossFlag[IndividualCount] > 0)) and (index != self.EndIndex-1):
                     #print("No money on individual ",IndividualCount)
                     TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
@@ -96,7 +98,6 @@ class FitnessFunction:
                 self.DfFitness.profit += self.DfFitness.holding * (df.Open[index] - df.Open[self.DailyFirstIndex])
                 #calculate riskFree
                 self.DfFitness.riskfree += self.rfrate * (self.InitialCapital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
-                
     def getRreturn(self):
         return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost)/self.InitialCapital)
     
