@@ -88,19 +88,23 @@ def computeMA(typeMA, startindex, endindex, period, df):
 
     if memo['sma']== {}:
         initialisation(list(df['Close']))
-    startindex=startindex - period
-    endindex = endindex - period
+
+
+    if startindex <= period:
+        start = startindex
+        end = endindex + 1
+    else:
+        start = startindex - period
+        end = endindex + 1 - period
+
     if typeMA == 0:
-        return memo['sma'][period][startindex:endindex+1]
+        return memo['sma'][period][start:end]
     elif typeMA == 1:
-        if startindex <= period:
-            return memo['tma'][period][startindex:endindex+1]
-        else:
-            return memo['tma'][period][startindex-period:endindex+1-period]
+        return memo['tma'][period][start:end]
     elif typeMA == 2:
-        return memo['tpma'][period][startindex:endindex+1]
+        return memo['tpma'][period][start:end]
     elif typeMA == 3:
-        return memo['ama'][period][startindex:endindex+1]
+        return memo['ama'][period][start:end]
     else:
         return []
     
