@@ -46,7 +46,7 @@ y4=0
 for i in range (0,groupLength):
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
     print("Begin of group ",i+1,datetime.datetime.now())
-    y1 += subGroupSize
+    y1 = subGroupSize*9
     # yTmp = y1 + subGroupSize
     # y2 = yTmp + subGroupSize
     y2 = y1 + subGroupSize
