@@ -151,9 +151,12 @@ short_moving_average_choices = [1,3,5,10,15,20]
 ma_combinations = [list(tup) for tup in itertools.product(short_moving_average_choices, long_moving_average_choices)]
 ma_combinations = list(itertools.compress(ma_combinations,[combi[0]<combi[1] for combi in ma_combinations]))
 
+ma_type_choices = [0,1,2,3]
+ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
+
 # Possible rule choices
 rule_choices = {
-    'moving_average_choices' : [0,1,2,3],
+    'moving_average_choices' : ma_type_combinations,
     'ma_combinations':ma_combinations,
     'membership_choices' : [0,1,2,3,4,5,6],        
         }
