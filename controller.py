@@ -74,8 +74,8 @@ for i in range (0,groupLength-1):
     rreturnLog=[]
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
-        print("GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,True)
+        #print("GA iteration ",j)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
         result = FF.getRreturn()
         #print(result)
         if BestReturn < result.max(skipna=True):
