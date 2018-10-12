@@ -10,7 +10,7 @@ memo={'sma':{},
 def smafunc(period, lst):
     
     count = 0
-    memo['sma'][period] = []
+    memo['sma'][period] = [0 for i in range(period-1)]
     
     while count + period <= len(lst):
         start = count
@@ -23,7 +23,7 @@ def tmafunc(period):
 
     lst = memo['sma'][period]
     count = 0
-    memo['tma'][period] = []
+    memo['tma'][period] = [0 for i in range(period-1)]
     
     while count + period <= len(lst):
         start = count
@@ -33,7 +33,7 @@ def tmafunc(period):
 
 def tpmafunc(period, lst):
     
-    memo['tpma'][period] = []
+    memo['tpma'][period] = [0 for i in range(period-1)]
     count = 0
 
     while count + period <= len(lst):
@@ -50,13 +50,13 @@ def amafunc(period, lst):
     
     ini_ama = sum(lst[:period])/period
         
-    memo['ama'][period] = [ini_ama,]
+    memo['ama'][period] = [0 for i in range(period-1)] + [ini_ama,]
     fastSC = 2/(1 + 2)
     slowSC = 2/(1 + 30)
 
-    k_1 = period 
+    k_1 = period
     k_n = 1
-    k = 1
+    k = len([0 for i in range(period-1)])
 
     while k_1 < len(lst):
         signal = abs(lst[k_1] - lst[k_n])
