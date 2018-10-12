@@ -61,7 +61,7 @@ for i in range (0,groupLength-1):
     print('End of testing SubGroup: '+ str(y4))
     
     #Apply first random rule on training section
-    flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True)
+    flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic)
     result = FF.getRreturn()
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
