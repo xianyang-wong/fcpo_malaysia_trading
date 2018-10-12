@@ -45,8 +45,12 @@ y3=0
 y4=0
 
 totalAssets = []
-
+AccountStatus = [1000000.0,0,0,0,0,0]
+ClosePosition = False
 for i in range (0,groupLength-1):
+    #Close position when last test group done.In order to calculate total asset
+    if i == groupLength-1:
+        ClosePosition = True
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
     print("Begin of group: ",i+1,datetime.datetime.now())
     y1 += subGroupSize
@@ -62,7 +66,7 @@ for i in range (0,groupLength-1):
     
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True,True)
-    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic)
+    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
     result = FF.getRreturn()
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     BestReturn=-10
@@ -71,7 +75,7 @@ for i in range (0,groupLength-1):
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         print("GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,True)
         result = FF.getRreturn()
         #print(result)
         if BestReturn < result.max(skipna=True):
@@ -82,7 +86,9 @@ for i in range (0,groupLength-1):
     #Apply best individual to test section then record total asset.
     print(rreturnLog)
     Collection = BestIndividual
-    FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic)
+    FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic,AccountStatus,ClosePosition,True)
+    #store account status after applying best individual.
+    AccountStatus = FF.getAccountStatus()
     totalAsset = FF.getTotalAsset()
     totalAssets.append(totalAsset)
     print("End of group: ",i+1,datetime.datetime.now())

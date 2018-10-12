@@ -24,15 +24,19 @@ class FitnessFunction:
             return -1
         else:
             return sum(list)/len(list)
-        
-    def __init__(self,s0,s1,df,Collection,flogic):
-        self.fuzzylogic=flogic
-        self.DfFitness = pd.DataFrame(np.array([1000000.0,0,0,0,0,0]*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
+    
+    #ListInitialState is the account status,[a,b,c,d,e,f] a:initial balance , b: profit ,c:holding position ,d: accumulated cost of trading, e: risk free income ,f:deposit
+    #ClosePosition takes 'True','False', indicate if the program close the position at the end.
+    #PlotHolding if 'True' will plot Hoding,Intersection,price against index
+    def __init__(self,s0,s1,df,Collection,flogic,ListInitialState,ClosePosition,PlotHolding):
+        self.fuzzylogic = flogic
+        self.DfFitness = pd.DataFrame(np.array(ListInitialState*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
-        self.LastMA=pd.DataFrame([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
-        self.CrossFlag=[]
+        self.LastMA=np.zeros(20)
+        self.ClosePosition = ClosePosition
+        self.PlotHolding = PlotHolding
         
         for index in range(self.StartIndex, self.EndIndex):
             if df.Flag[index] == 1:
@@ -43,7 +47,7 @@ class FitnessFunction:
             for ruleSet in Collection:
                 tmpList=[]
                 tmpMA=[]
-                for rule in ruleSet:#rule:{a,b,c,d,e} a:MA 0-3 ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
+                for rule in ruleSet:#rule:{a,b,c,d,e} a:MA [m type,n type] ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
                     MAd = self.MA_Diff(rule[0],rule[1][1],rule[1][0],index,df)
                     recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0][0]),int(rule[2]),int(rule[0][1]))
                     if recommandValue >= 0:#result will not be taken into account if recommandValue below 0
@@ -52,16 +56,19 @@ class FitnessFunction:
                 rlevelList.append(self.Average(tmpList))
                 MA_List.append(self.Average(tmpMA))
             self.DfRlevel = pd.DataFrame(rlevelList)#Dataframe that stores rlevel values for all 20 individuals
-            self.CrossFlag = (pd.DataFrame(MA_List) * self.LastMA)[0].tolist()
-            self.LastMA = pd.DataFrame(MA_List)
-            self.CrossFlag += [0] * (20 - len(self.CrossFlag))
-            self.CrossFlag = np.sign(self.CrossFlag)
+            #CrossFlag is used to determin if intersection happens.Possitive means no and Negative means intersection happens.
+            self.CrossFlag = (np.multiply(np.asarray(MA_List),self.LastMA)).tolist()
+            self.LastMA = np.asarray(MA_List)
+            #if the ruleset only contain 1 rule then need to pad CrossFlag to 20 elements. then use sign to remove values just keep sign
+            self.CrossFlag = np.sign(np.pad(self.CrossFlag, (0,(20 - len(self.CrossFlag))), 'constant', constant_values=(0, 0)))
             
             TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
             #Dataframe stores valeus to calculate fitness function at current moment.
 
-            #Calculate Holding,if reaching the end of session, sell all holdings to cash out.
-            if index != self.EndIndex-1:
+            #Calculate Holding,if reaching the end of session and required to close position,clear holdings to cash out.
+            if index == (self.EndIndex-1) and ClosePosition:
+                TmpDfFitness['holding'] = 0
+            else:
                 TmpDfFitness['holding'] = ((self.InitialCapital - self.DfFitness['deposit']) /(df.High[index] * self.Deposit))* self.DfRlevel
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):
@@ -104,5 +111,7 @@ class FitnessFunction:
     def getTotalAsset(self):
         totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost
         print("Total asset is :",totalAsset[0])
-        print(self.DfFitness)
         return totalAsset[0]
+
+    def getAccountStatus(self):
+        return self.DfFitness.loc[0, :].values.tolist()
