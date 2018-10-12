@@ -81,6 +81,9 @@ class FitnessFunction:
             
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):
+                # to save time ,if this timing is not intersection, skip
+                if (self.CrossFlag[IndividualCount] >= 0):
+                    continue
                 HoldingDiff = self.DfFitness.iloc[IndividualCount]['holding'] - TmpDfFitness.iloc[IndividualCount]['holding']
                 if HoldingDiff < 0:#this means buy,HoldingDiff is negative.
                     if IndividualCount == self.StartIndex:# if this is the first transation, calculate profit differently(subtract from the rest)
