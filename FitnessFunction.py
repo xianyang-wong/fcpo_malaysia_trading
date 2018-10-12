@@ -14,8 +14,8 @@ class FitnessFunction:
 
     #caculate moving average at give index, will call SeeTing function ,here use SMA instead.
     def MA_Diff(self,MAType,m,n,index,df):#SMA as demo
-        mValues = maComp.computeMA(MAType, int(index), int(index), int(m), df)
-        nValues = maComp.computeMA(MAType, int(index), int(index), int(n), df)
+        mValues = maComp.computeMA(MAType[0], int(index), int(index), int(m), df)
+        nValues = maComp.computeMA(MAType[1], int(index), int(index), int(n), df)
         v =  np.subtract(nValues,mValues)
         return v[0]
 
