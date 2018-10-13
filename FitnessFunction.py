@@ -128,10 +128,11 @@ class FitnessFunction:
             #print(self.HoldingPlot)
             #print("here comes plot")
     def getRreturn(self,df):
-        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  - (self.DfFitness.holding * df.High[self.EndIndex]) )/self.InitialCapital)
+        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  + (self.DfFitness.holding * df.High[self.EndIndex]) )/self.InitialCapital)
     
     def getTotalAsset(self,df):
-        totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost - (self.DfFitness.holding * df.High[self.EndIndex])
+        totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost + (self.DfFitness.holding * df.High[self.EndIndex])
+        print(self.DfFitness)
         print("Total asset is :",totalAsset[0])
         return totalAsset[0]
 
