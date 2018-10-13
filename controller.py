@@ -28,7 +28,6 @@ elif dfType == 2:
     SubGroupSize = 200
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
 elif dfType == 3:
-    #num_of_groups = 17
     SubGroupSize=250
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))    
 
@@ -42,7 +41,7 @@ dfTmp = parsed[parsed['Date']== '2014-01-02']
 TargetIndex = dfTmp.index.values[0]
 print('Test Index: ',TargetIndex)
 
-y1=TargetIndex-(SubGroupSize* 2)
+y1=TargetIndex-(SubGroupSize* 3)
 y2=0
 y3=0
 y4=0
@@ -50,23 +49,24 @@ y4=0
 totalAssets = []
 AccountStatus = [1000000.0,0,0,0,0,0]
 ClosePosition = False
-for i in range (0,NumberOfGroups-1):
+for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i == NumberOfGroups-1:
         ClosePosition = True
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
     print("Begin of group: ",i+1,datetime.datetime.now())
     y1 += SubGroupSize
-    # yTmp = y1 + subGroupSize
-    # y2 = yTmp + subGroupSize
     y2 = y1 + SubGroupSize
     y3 = y2 + SubGroupSize
     y4 = y3 + SubGroupSize
     print('Begin of training SubGroup: '+ str(y1))
     print('Begin of select SubGroup: '+ str(y2))
     print('Begin of testing SubGroup: '+ str(y3))
-    print('End of testing SubGroup: '+ str(y4))
-    
+    if (y4+SubGroupSize)>len(parsed):
+        y4=len(parsed)
+        print('End of testing SubGroup: '+ str(y4))
+        break    
+
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
