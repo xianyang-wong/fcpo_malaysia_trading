@@ -152,7 +152,12 @@ ma_combinations = [list(tup) for tup in itertools.product(short_moving_average_c
 ma_combinations = list(itertools.compress(ma_combinations,[combi[0]<combi[1] for combi in ma_combinations]))
 
 ma_type_choices = [0,1,2,3]
+# Line 156: MA type choices where the long and short can be different
 ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
+filter_combinations = [combi[0] == combi[1] for combi in ma_type_combinations]
+# Uncomment line 159 to have MA type choices where the long and short are the same and cannot be different
+# ma_type_combinations = list(itertools.compress(ma_type_combinations,filter_combinations))
+
 
 # Possible rule choices
 rule_choices = {
