@@ -46,7 +46,7 @@ y4=0
 totalAssets = []
 AccountStatus = [1000000.0,0,0,0,0,0]
 ClosePosition = False
-for i in range (0,NumberOfGroups-1):
+for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i == NumberOfGroups-1:
         ClosePosition = True
@@ -88,7 +88,7 @@ for i in range (0,NumberOfGroups-1):
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic,AccountStatus,ClosePosition,True)
     #store account status after applying best individual.
     AccountStatus = FF.getAccountStatus()
-    totalAsset = FF.getTotalAsset()
+    totalAsset = FF.getTotalAsset(parsed)
     totalAssets.append(totalAsset)
     print("End of group: ",i+1,datetime.datetime.now())
 

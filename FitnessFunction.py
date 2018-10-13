@@ -39,7 +39,6 @@ class FitnessFunction:
         self.LastMA=np.zeros(20)
         self.ClosePosition = ClosePosition
         self.PlotHolding = PlotHolding
-        
         self.ForPlot=[]
         for index in range(self.StartIndex, self.EndIndex):
             #prepare data for plotting
@@ -131,8 +130,8 @@ class FitnessFunction:
     def getRreturn(self):
         return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost)/self.InitialCapital)
     
-    def getTotalAsset(self):
-        totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost
+    def getTotalAsset(self,df):
+        totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost - (self.DfFitness.holding * df.High[self.EndIndex])
         print("Total asset is :",totalAsset[0])
         return totalAsset[0]
 
