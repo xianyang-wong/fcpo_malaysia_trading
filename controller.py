@@ -18,28 +18,27 @@ directory = ''
 
 #configuration parameters.
 GA_Iterations=51
-
-dfType = 3 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
+SubGroupSize=0
+TargetIndex=1000
+dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
-    num_of_groups = 69
+    SubGroupSize = 200
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
 elif dfType == 2:
-    num_of_groups = 3
+    SubGroupSize = 200
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
 elif dfType == 3:
-    num_of_groups = 17
+    #num_of_groups = 17
+    SubGroupSize=250
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))    
 
 print('--------------')
 print("Total number of indexes: ",len(parsed))
-groupSize = int(len(parsed)/num_of_groups)
-subGroupSize = int(groupSize/4)
-groupLength = int(len(parsed)/subGroupSize) - 3
-print("Group size: ",groupSize)
-print("SubGroup size: ",subGroupSize)
+NumberOfGroups = int((len(parsed) / SubGroupSize) -3)
+print("Total number of groups: ",NumberOfGroups)
 print('--------------')
 
-y1=0
+y1=TargetIndex-(SubGroupSize* 2)
 y2=0
 y3=0
 y4=0
@@ -47,18 +46,18 @@ y4=0
 totalAssets = []
 AccountStatus = [1000000.0,0,0,0,0,0]
 ClosePosition = False
-for i in range (0,groupLength-1):
+for i in range (0,NumberOfGroups-1):
     #Close position when last test group done.In order to calculate total asset
-    if i == groupLength-1:
+    if i == NumberOfGroups-1:
         ClosePosition = True
     Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
     print("Begin of group: ",i+1,datetime.datetime.now())
-    y1 += subGroupSize
+    y1 += SubGroupSize
     # yTmp = y1 + subGroupSize
     # y2 = yTmp + subGroupSize
-    y2 = y1 + subGroupSize
-    y3 = y2 + subGroupSize
-    y4 = y3 + subGroupSize
+    y2 = y1 + SubGroupSize
+    y3 = y2 + SubGroupSize
+    y4 = y3 + SubGroupSize
     print('Begin of training SubGroup: '+ str(y1))
     print('Begin of select SubGroup: '+ str(y2))
     print('Begin of testing SubGroup: '+ str(y3))
