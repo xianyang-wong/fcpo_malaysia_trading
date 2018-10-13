@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
 class FitnessFunction:
-    InitialCapital=1000000
+    InitialCapital=10000000
     #initial capital
    
     Deposit = 0.15

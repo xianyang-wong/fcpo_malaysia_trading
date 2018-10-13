@@ -47,7 +47,7 @@ y3=0
 y4=0
 
 totalAssets = []
-AccountStatus = [1000000.0,0,0,0,0,0]
+AccountStatus = [10000000.0,0,0,0,0,0]
 ClosePosition = False
 for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
@@ -69,7 +69,7 @@ for i in range (0,NumberOfGroups):
 
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True,True)
-    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
+    FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic,[10000000.0,0,0,0,0,0],True,False)
     result = FF.getRreturn(parsed)
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     BestReturn=-10
@@ -78,7 +78,7 @@ for i in range (0,NumberOfGroups):
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         print("GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic,[10000000.0,0,0,0,0,0],True,False)
         result = FF.getRreturn(parsed)
         #print(result)
         if BestReturn < result.max(skipna=True):
