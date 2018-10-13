@@ -70,7 +70,7 @@ for i in range (0,NumberOfGroups):
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed,True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
-    result = FF.getRreturn()
+    result = FF.getRreturn(parsed)
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     BestReturn=-10
     BestIndividual=[[]]
@@ -79,7 +79,7 @@ for i in range (0,NumberOfGroups):
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         #print("GA iteration ",j)
         FF =FitnessFunction.FitnessFunction(y2,y3,parsed,Collection,flogic,[1000000.0,0,0,0,0,0],True,False)
-        result = FF.getRreturn()
+        result = FF.getRreturn(parsed)
         #print(result)
         if BestReturn < result.max(skipna=True):
             BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
@@ -92,7 +92,7 @@ for i in range (0,NumberOfGroups):
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed,Collection,flogic,AccountStatus,ClosePosition,True)
     #store account status after applying best individual.
     AccountStatus = FF.getAccountStatus()
-    totalAsset = FF.getTotalAsset()
+    totalAsset = FF.getTotalAsset(parsed)
     totalAssets.append(totalAsset)
     print("End of group: ",i+1,datetime.datetime.now())
 
