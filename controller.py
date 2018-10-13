@@ -38,6 +38,10 @@ NumberOfGroups = int((len(parsed) / SubGroupSize) -3)
 print("Total number of groups: ",NumberOfGroups)
 print('--------------')
 
+dfTmp = parsed[parsed['Date']== '2014-01-02']
+TargetIndex = dfTmp.index.values[0]
+print('Test Index: ',TargetIndex)
+
 y1=TargetIndex-(SubGroupSize* 2)
 y2=0
 y3=0
