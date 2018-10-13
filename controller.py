@@ -50,7 +50,7 @@ y4=0
 totalAssets = []
 AccountStatus = [1000000.0,0,0,0,0,0]
 ClosePosition = False
-for i in range (0,NumberOfGroups-1):
+for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i == NumberOfGroups-1:
         ClosePosition = True
