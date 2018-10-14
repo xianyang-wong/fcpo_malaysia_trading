@@ -90,3 +90,23 @@ saveDf(parsed,'Parsed')
 saveDf(parsedByDay,'ParsedByDay')
 saveDf(parsedByHour,'ParsedByHour')
 
+# Correct Parsing of Daily Data #
+#parsedDaily = parsed[['Date','Open','High','Low','Close','Volume']].groupby('Date').aggregate({'Open':'first',
+#                                                                                               'High':'max',
+#                                                                                               'Low':'min',
+#                                                                                               'Close':'last',
+#                                                                                               'Volume':'sum'}).reset_index()
+
+#parsedHourly = parsed[['Date','Hour','Open','High','Low','Close','Volume']].groupby(['Date','Hour']).aggregate({'Open':'first',
+#                                                                                                                'High':'max',
+#                                                                                                                'Low':'min',
+#                                                                                                                'Close':'last',
+#                                                                                                                'Volume':'sum'}).reset_index()
+
+#parsedDaily = parsed[['Date','Hour','Minute','Open','High','Low','Close','Volume']].groupby(['Date','Hour','Minute']).aggregate({'Open':'first',
+#                                                                                                                                'High':'max',
+#                                                                                                                                'Low':'min',
+#                                                                                                                                'Close':'last',
+#                                                                                                                                'Volume':'sum'}).reset_index()
+
+
