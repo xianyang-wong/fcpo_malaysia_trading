@@ -44,9 +44,9 @@ class FitnessFunction:
             self.tmpPlot.append(index)
             self.tmpPlot.append(df.High[index])
             
-            if df.Flag[index] == 1:
-                self.DailyFirstIndex = index
-             #calculate rlevel for each individual,20 in total
+            #if df.Flag[index] == 1:
+            #    self.DailyFirstIndex = index
+            #calculate rlevel for each individual,20 in total
             rlevelList=[]
             MA_List=[]
             for ruleSet in Collection:
@@ -108,10 +108,9 @@ class FitnessFunction:
                         if (self.CrossFlag[IndividualCount] >= 0) or(self.DfFitness.capital[IndividualCount] + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0):
                             TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
-            if df.Flag[index] == 2:# clear daily holding profit
-                self.DfFitness.profit += self.DfFitness.holding * (df.Open[index] - df.Open[self.DailyFirstIndex])
-                #calculate riskFree
-                self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
+            self.DfFitness.profit += self.DfFitness.holding * (df.Close[index] - df.Open[index])
+            #calculate riskFree
+            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
             self.tmpPlot.append(self.CrossFlag[0]*100)
             self.tmpPlot.append(self.DfFitness.holding[0])
             self.ForPlot.append(self.tmpPlot)
