@@ -58,6 +58,7 @@ for i in range (0,NumberOfGroups):
                                                       [0,1,2,3], # Choices for MA type
                                                       [10,20,50,100,150,200], # Choices for m
                                                       [1,3,5,10,15,20]) # Choices for n
+    print(rule_choices)
     Collection = genetic_algo.generate_collection(20, 10, rule_choices)
 
     print("--------------------------------------")

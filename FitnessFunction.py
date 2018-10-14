@@ -53,8 +53,8 @@ class FitnessFunction:
                 tmpList=[]
                 tmpMA=[]
                 for rule in ruleSet:#rule:{a,b,c,d,e} a:MA [m type,n type] ,b:m {10,20,50100,150,200}, c:n {1,3,5,10,15,20} ,d:membership 0-6, e:recommand [-1, 1]
-                    MAd = self.MA_Diff(rule[0],rule[1][1],rule[1][0],index,df)
-                    recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][1]),int(rule[1][0]),int(rule[0][0]),int(rule[2]),int(rule[0][1]))
+                    MAd = self.MA_Diff(rule[0],rule[1][0],rule[1][1],index,df)
+                    recommandValue = self.fuzzylogic.ComputeMembership(MAd,int(rule[1][0]),int(rule[1][1]),int(rule[0][0]),int(rule[2]),int(rule[0][1]))
                     if recommandValue >= 0:#result will not be taken into account if recommandValue below 0
                         tmpList.append(recommandValue* rule[3])
                     tmpMA.append(MAd)
