@@ -23,11 +23,6 @@ for day in range(0,daily1415.shape[0]):
     # if losses above deposit close out position
     """"""
 
-    """"""
-    # NEED TO ADD
-    # Append current_status to current_records with Daily Date
-    """"""
-
     if daily1415['trade_flag'][day]==1:
         trade_signal_holding = trade_signals['Holding'][trade_signals['Date'] == daily1415['Date'][day]]
 
@@ -62,4 +57,7 @@ for day in range(0,daily1415.shape[0]):
         # NEED TO ADD
         # Append current_status to current_records with Daily Date
         """"""
-
+    """"""
+    # NEED TO ADD
+    # Append current_status to current_records with Daily Date
+    """"""
