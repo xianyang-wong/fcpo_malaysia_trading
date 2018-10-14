@@ -145,20 +145,21 @@ def evolve(collection, rule_choices, fitness, crossover_pct, mutation_pct):
     return iteration_collection
 
 def generate_rule_choices(switch, ma_type_choices, long_moving_average_choices, short_moving_average_choices):
-    
     if switch == 'same':
         ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
         filter_combinations = [combi[0] == combi[1] for combi in ma_type_combinations]
-        ma_type_combinations = list(itertools.compress(ma_type_combinations,filter_combinations))
+        ma_type_combinations = list(itertools.compress(ma_type_combinations, filter_combinations))
     elif switch == 'different':
         ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
-    
+        
+    ma_combinations = [list(tup) for tup in itertools.product(long_moving_average_choices, short_moving_average_choices)]
+
     rule_choices = {
-        'moving_average_choices' : ma_type_combinations,
-        'ma_combinations':ma_combinations,
-        'membership_choices' : [0,1,2,3,4,5,6],        
-            }
-    
+        'moving_average_choices': ma_type_combinations,
+        'ma_combinations': ma_combinations,
+        'membership_choices': [0, 1, 2, 3, 4, 5, 6],
+    }
+
     return rule_choices
 
 ### Running the functions
