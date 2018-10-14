@@ -93,7 +93,7 @@ for i in range (0,NumberOfGroups):
             rreturnLog.append(result.max(skipna=True))
             BestReturn = result.max(skipna=True)
         
-        Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
+        Collection = genetic_algo.evolve(Collection, rule_choices, result.values, 0.7, 0.01)
     #Apply best individual to test section then record total asset.
     print(rreturnLog)
     Collection = BestIndividual
