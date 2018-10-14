@@ -80,7 +80,7 @@ class FitnessFunction:
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):           
                 # to save time ,if this timing is not intersection, skip
-                if (self.CrossFlag[IndividualCount] >= 0):
+                if (self.CrossFlag[IndividualCount] >= 0) and self.TradeOnIntersection :
                     continue
                 HoldingDiff = self.DfFitness.iloc[IndividualCount]['holding'] - TmpDfFitness.iloc[IndividualCount]['holding']
                 currentTradePrice=0
@@ -115,13 +115,19 @@ class FitnessFunction:
                             TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
                             if IndividualCount == 0:
                                 TradeHappens=False
+                    else:
+                        if (self.DfFitness.capital[IndividualCount] + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0):
+                            TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
+                            if IndividualCount == 0:
+                                TradeHappens=False                       
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
+            self.tmpLog.append(self.DfFitness.profit[0])
+            #calculate daily profit
             self.DfFitness.profit += self.DfFitness.holding * (df.Close[index] - df.Open[index])
             self.tmpLog.append(self.DfFitness.holding[0])
             self.tmpLog.append(self.DfFitness.deposit[0])
-            
             self.tmpLog.append((self.DfFitness.holding * (df.Close[index] - df.Open[index]))[0])
-            self.tmpLog.append(self.DfFitness.profit[0])
+            
             #calculate riskFree
             self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
             self.tmpPlot.append(self.CrossFlag[0]*100)
@@ -132,7 +138,7 @@ class FitnessFunction:
                 self.TradeLog.append(self.tmpLog)
             
         self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding','date'])
-        self.TRlog = pd.DataFrame(self.TradeLog,columns=['Date','Holding','Deposit','HoldProfit','Profit'])
+        self.TRlog = pd.DataFrame(self.TradeLog,columns=['Date','Profit','Holding','Deposit','HoldProfit'])
         if PlotHolding:
             self.HoldingPlot.set_index('index').plot(y=['intersect','holding'],figsize=(10,5), grid=True)
             savefile = "HoldingPlot" + str(index)   # file might need to be replaced by a string
