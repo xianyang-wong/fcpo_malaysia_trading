@@ -54,7 +54,11 @@ for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i != 0:
         FirstPosition = False
-    Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
+    rule_choices = genetic_algo.generate_rule_choices('same', # Parameters: 'same' or 'different'
+                                                      [0,1,2,3], # Choices for MA type
+                                                      [10,20,50,100,150,200], # Choices for m
+                                                      [1,3,5,10,15,20]) # Choices for n
+    Collection = genetic_algo.generate_collection(20, 10, rule_choices)
     print("--------------------------------------")
     print("Begin of group: ",i+1,datetime.datetime.now())
     y1 += SubGroupSize
@@ -72,7 +76,7 @@ for i in range (0,NumberOfGroups):
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
     result = FF.getRreturn(parsed.loc[:,:])
-    Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
+    Collection = genetic_algo.evolve(Collection, rule_choices, result.values, 0.7, 0.01)
     BestReturn=-10
     BestIndividual=[[]]
     rreturnLog=[]
