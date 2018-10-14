@@ -153,6 +153,8 @@ def generate_rule_choices(switch, ma_type_choices, long_moving_average_choices, 
         ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
         
     ma_combinations = [list(tup) for tup in itertools.product(long_moving_average_choices, short_moving_average_choices)]
+    filter_combinations = [combi[0] > combi[1] for combi in ma_combinations]
+    ma_combinations = list(itertools.compress(ma_combinations, filter_combinations))
 
     rule_choices = {
         'moving_average_choices': ma_type_combinations,
