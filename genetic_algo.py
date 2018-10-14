@@ -145,28 +145,31 @@ def evolve(collection, rule_choices, fitness, crossover_pct, mutation_pct):
     return iteration_collection
 
 ### Running the functions
+# Defining rule choices
 long_moving_average_choices = [10,20,50,100,150,200]
 short_moving_average_choices = [1,3,5,10,15,20]
-
-ma_combinations = [list(tup) for tup in itertools.product(short_moving_average_choices, long_moving_average_choices)]
-ma_combinations = list(itertools.compress(ma_combinations,[combi[0]<combi[1] for combi in ma_combinations]))
-
 ma_type_choices = [0,1,2,3]
-# Line 156: MA type choices where the long and short can be different
-ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
-filter_combinations = [combi[0] == combi[1] for combi in ma_type_combinations]
-# Uncomment line 159 to have MA type choices where the long and short are the same and cannot be different
-# ma_type_combinations = list(itertools.compress(ma_type_combinations,filter_combinations))
-
 
 # Possible rule choices
-rule_choices = {
-    'moving_average_choices' : ma_type_combinations,
-    'ma_combinations':ma_combinations,
-    'membership_choices' : [0,1,2,3,4,5,6],        
-        }
+def generate_rule_choices(switch, ma_type_choices, long_moving_average_choices, short_moving_average_choices):
+    
+    if switch == 'same':
+        ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
+        filter_combinations = [combi[0] == combi[1] for combi in ma_type_combinations]
+        ma_type_combinations = list(itertools.compress(ma_type_combinations,filter_combinations))
+    elif switch == 'different':
+        ma_type_combinations = [list(tup) for tup in itertools.product(ma_type_choices, ma_type_choices)]
+    
+    rule_choices = {
+        'moving_average_choices' : ma_type_combinations,
+        'ma_combinations':ma_combinations,
+        'membership_choices' : [0,1,2,3,4,5,6],        
+            }
+    
+    return rule_choices
 
 # Create collection of 20 different ruleset consisting of 10 rules each
+#rule_choices = generate_rule_choices('same', ma_type_choices, long_moving_average_choices, short_moving_average_choices)
 #collection = generate_collection(20, 10, rule_choices)
 
 # Simulated fitness values
