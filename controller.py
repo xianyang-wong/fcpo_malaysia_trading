@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 directory = ''
 
 #configuration parameters.
-GA_Iterations=3
+GA_Iterations=20
 #SubGroupSize=0# No need to change
 TargetIndex=1000
 TradeWhenIntersection=False #set to True if only trade at intersection or False if trade at every data point
@@ -54,7 +54,7 @@ for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i != 0:
         FirstPosition = False
-    Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices)
+    Collection = genetic_algo.generate_collection(20, 10, genetic_algo.rule_choices,"different")
     print("--------------------------------------")
     print("Begin of group: ",i+1,datetime.datetime.now())
     y1 += SubGroupSize
