@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
 class FitnessFunction:
-    InitialCapital=10000000
+    #InitialCapital=10000000
     #initial capital
    
     Deposit = 0.15
@@ -28,17 +28,18 @@ class FitnessFunction:
             return sum(list)/len(list)
     
     #ListInitialState is the account status,[a,b,c,d,e,f] a:initial balance , b: profit ,c:holding position ,d: accumulated cost of trading, e: risk free income ,f:deposit
-    #ClosePosition takes 'True','False', indicate if the program close the position at the end.
+    #FirstPosition takes 'True','False', indicate if the first index need to do trading
     #PlotHolding if 'True' will plot Hoding,Intersection,price against index
-    def __init__(self,s0,s1,df,Collection,flogic,ListInitialState,ClosePosition,PlotHolding):
+    def __init__(self,s0,s1,df,Collection,flogic,ListInitialState,FirstPosition,PlotHolding,TradeOnIntersection):
         self.fuzzylogic = flogic
         self.DfFitness = pd.DataFrame(np.array(ListInitialState*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
         self.LastMA=np.zeros(20)
-        self.ClosePosition = ClosePosition
+        self.FirstPosition = FirstPosition
         self.PlotHolding = PlotHolding
+        self.TradeOnIntersection = TradeOnIntersection
         self.ForPlot=[]
         for index in range(self.StartIndex, self.EndIndex):
             #prepare data for plotting
@@ -69,14 +70,11 @@ class FitnessFunction:
             #if the ruleset only contain 1 rule then need to pad CrossFlag to 20 elements. then use sign to remove values just keep sign
             self.CrossFlag = np.sign(np.pad(self.CrossFlag, (0,(20 - len(self.CrossFlag))), 'constant', constant_values=(0, 0)))
 
-            TmpDfFitness = pd.DataFrame(np.array([0.0,0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
+            TmpDfFitness = pd.DataFrame(np.array([ListInitialState[0],0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
             #Dataframe stores valeus to calculate fitness function at current moment.
 
-            #Calculate Holding,if reaching the end of session and required to close position,clear holdings to cash out.
-            if index == (self.EndIndex-1) and self.ClosePosition:
-                TmpDfFitness['holding'] = 0
-            else:
-                TmpDfFitness['holding'] = ((self.InitialCapital - self.DfFitness['deposit']) /(df.High[index] * self.Deposit))* self.DfRlevel
+            #Calculate holding
+            TmpDfFitness['holding'] = ((self.DfFitness['capital'] - self.DfFitness['deposit']) /(df.High[index] * self.Deposit))* self.DfRlevel
             
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):
@@ -91,8 +89,6 @@ class FitnessFunction:
                         TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.profit[IndividualCount]+ df.High[index] * HoldingDiff
                     #calculate Cost
                     TmpDfFitness.iloc[IndividualCount]['cost'] = abs(HoldingDiff) * df.High[index] * 0.002
-                    #calculate Capital
-                    #TmpDfFitness.capital[IndividualCount] = self.DfFitness.capital[IndividualCount] + HoldingDiff * df.iloc[index]['High'] * self.Deposit
                 else:
                     if IndividualCount == self.StartIndex:
                         TmpDfFitness.iloc[IndividualCount]['profit'] = df.Low[index] * TmpDfFitness.iloc[IndividualCount]['holding'] * -1
@@ -107,15 +103,16 @@ class FitnessFunction:
             TmpDfFitness['riskfree'] = self.DfFitness.riskfree
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
-            for IndividualCount in range(0,20):#do not trade if no capital or no intersection
-                if ((self.InitialCapital + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0) or (self.CrossFlag[IndividualCount] >= 0)) and ((index != self.EndIndex-1) or not self.ClosePosition):
-                    #print("No money on individual ",IndividualCount)
-                    TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
+            for IndividualCount in range(0,20):#Check through criteria and see if no need to trade at this index
+                if ((not self.FirstPosition) or index != self.StartIndex):
+                    if self.TradeOnIntersection:
+                        if (self.CrossFlag[IndividualCount] >= 0) or(self.DfFitness.capital[IndividualCount] + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0):
+                            TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]
             if df.Flag[index] == 2:# clear daily holding profit
                 self.DfFitness.profit += self.DfFitness.holding * (df.Open[index] - df.Open[self.DailyFirstIndex])
                 #calculate riskFree
-                self.DfFitness.riskfree += self.rfrate * (self.InitialCapital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
+                self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
             self.tmpPlot.append(self.CrossFlag[0]*100)
             self.tmpPlot.append(self.DfFitness.holding[0])
             self.ForPlot.append(self.tmpPlot)
@@ -125,14 +122,12 @@ class FitnessFunction:
             savefile = "HoldingPlot" + str(index) + '.png'   # file might need to be replaced by a string
             plt.savefig(savefile)       
             plt.show()
-            #print(self.HoldingPlot)
-            #print("here comes plot")
+            
     def getRreturn(self,df):
-        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  + (self.DfFitness.holding * df.High[self.EndIndex]) )/self.InitialCapital)
+        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  + (self.DfFitness.holding * df.High[self.EndIndex]) )/self.DfFitness.capital)
     
     def getTotalAsset(self,df):
-        totalAsset= self.InitialCapital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost + (self.DfFitness.holding * df.High[self.EndIndex])
-        print(self.DfFitness)
+        totalAsset= self.DfFitness.capital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost + (self.DfFitness.holding * df.High[self.EndIndex])
         print("Total asset is :",totalAsset[0])
         return totalAsset[0]
 
