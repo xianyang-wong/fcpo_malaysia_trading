@@ -31,6 +31,7 @@ class FitnessFunction:
     def __init__(self,s0,s1,df,Collection,flogic,ListInitialState,FirstPosition,PlotHolding,TradeOnIntersection):
         self.fuzzylogic = flogic
         self.DfFitness = pd.DataFrame(np.array(ListInitialState*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','lastTradeValue'])
+        #used to keep track of last status
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
@@ -96,9 +97,14 @@ class FitnessFunction:
                         #close previous position
                         TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + (self.DfFitness.iloc[IndividualCount]['holding'] * currentTradePrice)  - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
                     else:
-                        #calculate profit as uaual
+                        #calculate profit if holding has same sign
                         if abs(TmpDfFitness.iloc[IndividualCount]['holding']) < abs(self.DfFitness.iloc[IndividualCount]['holding']):
-                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + abs(TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                            #######################################################################################################################
+                            #High chance of bug here !!!!!!!!!!!! calculate profit when last and current holding are same sign but currently closer to zero...
+                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
+                            ########################################################################################################################
+                        else:
+                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit']
                 else:
                     TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit']
             #calculate deposit
