@@ -144,13 +144,6 @@ def evolve(collection, rule_choices, fitness, crossover_pct, mutation_pct):
 
     return iteration_collection
 
-### Running the functions
-# Defining rule choices
-long_moving_average_choices = [10,20,50,100,150,200]
-short_moving_average_choices = [1,3,5,10,15,20]
-ma_type_choices = [0,1,2,3]
-
-# Possible rule choices
 def generate_rule_choices(switch, ma_type_choices, long_moving_average_choices, short_moving_average_choices):
     
     if switch == 'same':
@@ -167,6 +160,12 @@ def generate_rule_choices(switch, ma_type_choices, long_moving_average_choices, 
             }
     
     return rule_choices
+
+### Running the functions
+# Defining rule choices
+long_moving_average_choices = [10,20,50,100,150,200]
+short_moving_average_choices = [1,3,5,10,15,20]
+ma_type_choices = [0,1,2,3]
 
 # Create collection of 20 different ruleset consisting of 10 rules each
 #rule_choices = generate_rule_choices('same', ma_type_choices, long_moving_average_choices, short_moving_average_choices)
