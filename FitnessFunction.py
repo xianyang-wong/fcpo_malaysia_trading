@@ -2,6 +2,7 @@ import pandas as pd
 import MA_components as maComp
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
@@ -38,12 +39,15 @@ class FitnessFunction:
         self.PlotHolding = PlotHolding
         self.TradeOnIntersection = TradeOnIntersection
         self.ForPlot=[]
+        self.TradeLog=[]
         for index in range(self.StartIndex, self.EndIndex):
             #prepare data for plotting
             self.tmpPlot=[]
             self.tmpPlot.append(index)
             self.tmpPlot.append(df.High[index])
             
+            self.tmpLog=[]
+            self.tmpLog.append(df.Date[index])
             #if df.Flag[index] == 1:
             #    self.DailyFirstIndex = index
             #calculate rlevel for each individual,20 in total
@@ -93,7 +97,8 @@ class FitnessFunction:
                         TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + (self.DfFitness.iloc[IndividualCount]['holding'] * currentTradePrice)  - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
                     else:
                         #calculate profit as uaual
-                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
+                        if abs(TmpDfFitness.iloc[IndividualCount]['holding']) < abs(self.DfFitness.iloc[IndividualCount]['holding']):
+                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + abs(TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
                 else:
                     TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit']
             #calculate deposit
@@ -102,24 +107,41 @@ class FitnessFunction:
             TmpDfFitness['riskfree'] = self.DfFitness.riskfree
             #accumulate costs
             TmpDfFitness['cost'] = self.DfFitness.cost + TmpDfFitness.cost 
+            TradeHappens=True
             for IndividualCount in range(0,20):#Check through criteria and see if no need to trade at this index
                 if ((not self.FirstPosition) or index != self.StartIndex):
                     if self.TradeOnIntersection:
                         if (self.CrossFlag[IndividualCount] >= 0) or(self.DfFitness.capital[IndividualCount] + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0):
                             TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
+                            if IndividualCount == 0:
+                                TradeHappens=False
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             self.DfFitness.profit += self.DfFitness.holding * (df.Close[index] - df.Open[index])
+            self.tmpLog.append(self.DfFitness.holding[0])
+            self.tmpLog.append(self.DfFitness.deposit[0])
+            
+            self.tmpLog.append((self.DfFitness.holding * (df.Close[index] - df.Open[index]))[0])
+            self.tmpLog.append(self.DfFitness.profit[0])
             #calculate riskFree
             self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
             self.tmpPlot.append(self.CrossFlag[0]*100)
             self.tmpPlot.append(self.DfFitness.holding[0])
+            self.tmpPlot.append(df.Date[index])
             self.ForPlot.append(self.tmpPlot)
-        self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding'])
+            if TradeHappens:
+                self.TradeLog.append(self.tmpLog)
+            
+        self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding','date'])
+        self.TRlog = pd.DataFrame(self.TradeLog,columns=['Date','Holding','Deposit','HoldProfit','Profit'])
         if PlotHolding:
             self.HoldingPlot.set_index('index').plot(y=['intersect','holding'],figsize=(10,5), grid=True)
-            savefile = "HoldingPlot" + str(index) + '.png'   # file might need to be replaced by a string
-            plt.savefig(savefile)       
+            savefile = "HoldingPlot" + str(index)   # file might need to be replaced by a string
+            plt.savefig(savefile+ '.png' )       
             plt.show()
+
+            writer = pd.ExcelWriter(os.path.join('',savefile+'.xlsx'), engine='xlsxwriter')
+            self.TRlog.to_excel(writer)
+            writer.save()
             
     def getRreturn(self,df):
         return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  )/self.DfFitness.capital)
