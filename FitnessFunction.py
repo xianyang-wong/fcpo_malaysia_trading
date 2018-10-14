@@ -74,7 +74,7 @@ class FitnessFunction:
             TmpDfFitness['holding'] = ((self.DfFitness['capital'] + self.DfFitness['profit'] - self.DfFitness['deposit']) /(df.High[index] * self.Deposit))* self.DfRlevel
             
             #Calculate Profit and cost since it is affected by buy or sell option.
-            for IndividualCount in range(0,20):
+            for IndividualCount in range(0,20):           
                 # to save time ,if this timing is not intersection, skip
                 if (self.CrossFlag[IndividualCount] >= 0):
                     continue
@@ -85,10 +85,17 @@ class FitnessFunction:
                 else:
                     currentTradePrice = df.Low[index]
                 TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] = currentTradePrice * TmpDfFitness.iloc[IndividualCount]['holding']
-               #calculate Cost
                 TmpDfFitness.iloc[IndividualCount]['cost'] =  max((abs(HoldingDiff) * currentTradePrice * 0.002),self.minTradeCost)
-                if self.DfFitness.iloc[IndividualCount]['lastTradeValue'] != 0:# if this is the first transation or right after close position, calculate profit differently       
-                    TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
+                #if suggest holding change sign from previous, it is same as close position first then do grade from scrach.
+                if self.DfFitness.iloc[IndividualCount]['holding'] != 0:
+                    if (TmpDfFitness.iloc[IndividualCount]['holding'] == 0) or (TmpDfFitness.iloc[IndividualCount]['holding'] * self.DfFitness.iloc[IndividualCount]['holding'] < 0):
+                        #close previous position
+                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + (self.DfFitness.iloc[IndividualCount]['holding'] * currentTradePrice)  - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
+                    else:
+                        #calculate profit as uaual
+                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
+                else:
+                    TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit']
             #calculate deposit
             TmpDfFitness['deposit'] = abs(TmpDfFitness['holding']) * df.High[index] * self.Deposit
             #calculate risk-free
