@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 directory = ''
 
 #configuration parameters.
-GA_Iterations=2
+GA_Iterations=10
 #SubGroupSize=0# No need to change
 TargetIndex=1000
 TradeWhenIntersection=False #set to True if only trade at intersection or False if trade at every data point
@@ -48,7 +48,7 @@ y3=0
 y4=0
 
 totalAssets = []
-AccountStatus = [10000000.0,0,0,0,0,0]
+AccountStatus = [10000000.0,0,0,0,0,0,0]
 FirstPosition = True
 for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
@@ -65,13 +65,12 @@ for i in range (0,NumberOfGroups):
     print('Begin of select SubGroup: '+ str(y2))
     print('Begin of testing SubGroup: '+ str(y3))
     if (y4+SubGroupSize)>len(parsed):
-        y4=len(parsed)
-        print('End of testing SubGroup: '+ str(y4))
-        break    
-
+        y4=len(parsed)-1
+        print('End of testing SubGroup: '+ str(y4)) 
+        break
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
-    FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0],True,False,TradeWhenIntersection)
+    FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
     result = FF.getRreturn(parsed.loc[:,:])
     Collection = genetic_algo.evolve(Collection, genetic_algo.rule_choices, result.values, 0.7, 0.01)
     BestReturn=-10
@@ -80,7 +79,7 @@ for i in range (0,NumberOfGroups):
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         print("Processing GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0],True,False,TradeWhenIntersection)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         result = FF.getRreturn(parsed.loc[:,:])
         #print(result)
         if BestReturn < result.max(skipna=True):

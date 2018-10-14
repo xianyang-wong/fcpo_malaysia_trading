@@ -6,14 +6,11 @@ import matplotlib.pyplot as plt
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
 class FitnessFunction:
-    #InitialCapital=10000000
-    #initial capital
-   
     Deposit = 0.15
     #Holding   Deposit
     rfrate = 0.02
     #risk free return,year rate
-
+    minTradeCost=30.0
     #caculate moving average at give index, will call SeeTing function ,here use SMA instead.
     def MA_Diff(self,MAType,m,n,index,df):#SMA as demo
         mValues = maComp.computeMA(MAType[0], int(index), int(index), int(m), df)
@@ -32,7 +29,7 @@ class FitnessFunction:
     #PlotHolding if 'True' will plot Hoding,Intersection,price against index
     def __init__(self,s0,s1,df,Collection,flogic,ListInitialState,FirstPosition,PlotHolding,TradeOnIntersection):
         self.fuzzylogic = flogic
-        self.DfFitness = pd.DataFrame(np.array(ListInitialState*20).reshape(20,6),columns=['capital','profit','holding','cost','riskfree','deposit'])
+        self.DfFitness = pd.DataFrame(np.array(ListInitialState*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','lastTradeValue'])
         self.StartIndex = s0
         self.EndIndex = s1
         self.DailyFirstIndex = s0
@@ -70,11 +67,11 @@ class FitnessFunction:
             #if the ruleset only contain 1 rule then need to pad CrossFlag to 20 elements. then use sign to remove values just keep sign
             self.CrossFlag = np.sign(np.pad(self.CrossFlag, (0,(20 - len(self.CrossFlag))), 'constant', constant_values=(0, 0)))
 
-            TmpDfFitness = pd.DataFrame(np.array([ListInitialState[0],0,0,0,0,0,30]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','MinCost'])
+            TmpDfFitness = pd.DataFrame(np.array([ListInitialState[0],0,0,0,0,0,0]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','lastTradeValue'])
             #Dataframe stores valeus to calculate fitness function at current moment.
 
             #Calculate holding
-            TmpDfFitness['holding'] = ((self.DfFitness['capital'] - self.DfFitness['deposit']) /(df.High[index] * self.Deposit))* self.DfRlevel
+            TmpDfFitness['holding'] = ((self.DfFitness['capital'] + self.DfFitness['profit'] - self.DfFitness['deposit']) /(df.High[index] * self.Deposit))* self.DfRlevel
             
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):
@@ -82,23 +79,18 @@ class FitnessFunction:
                 if (self.CrossFlag[IndividualCount] >= 0):
                     continue
                 HoldingDiff = self.DfFitness.iloc[IndividualCount]['holding'] - TmpDfFitness.iloc[IndividualCount]['holding']
+                currentTradePrice=0
                 if HoldingDiff < 0:#this means buy,HoldingDiff is negative.
-                    if IndividualCount == self.StartIndex:# if this is the first transation, calculate profit differently(subtract from the rest)
-                        TmpDfFitness.iloc[IndividualCount]['profit'] = df.High[index] * TmpDfFitness.iloc[IndividualCount]['holding'] * -1
-                    else:
-                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.profit[IndividualCount]+ df.High[index] * HoldingDiff
-                    #calculate Cost
-                    TmpDfFitness.iloc[IndividualCount]['cost'] = abs(HoldingDiff) * df.High[index] * 0.002
+                    currentTradePrice = df.High[index]
                 else:
-                    if IndividualCount == self.StartIndex:
-                        TmpDfFitness.iloc[IndividualCount]['profit'] = df.Low[index] * TmpDfFitness.iloc[IndividualCount]['holding'] * -1
-                    else:
-                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.profit[IndividualCount]+ df.Low[index] * HoldingDiff
-                    #calculate Cost
-                    TmpDfFitness.iloc[IndividualCount]['cost'] =  abs(HoldingDiff) * df.Low[index] * 0.002  
-            TmpDfFitness['deposit'] = abs(TmpDfFitness['holding']) * df.High[index] * self.Deposit
+                    currentTradePrice = df.Low[index]
+                TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] = currentTradePrice * TmpDfFitness.iloc[IndividualCount]['holding']
+               #calculate Cost
+                TmpDfFitness.iloc[IndividualCount]['cost'] =  max((abs(HoldingDiff) * currentTradePrice * 0.002),self.minTradeCost)
+                if self.DfFitness.iloc[IndividualCount]['lastTradeValue'] != 0:# if this is the first transation or right after close position, calculate profit differently       
+                    TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] - self.DfFitness.iloc[IndividualCount]['lastTradeValue']
             #calculate deposit
-            TmpDfFitness['cost'] = TmpDfFitness[['cost', 'MinCost']].max(axis=1)
+            TmpDfFitness['deposit'] = abs(TmpDfFitness['holding']) * df.High[index] * self.Deposit
             #calculate risk-free
             TmpDfFitness['riskfree'] = self.DfFitness.riskfree
             #accumulate costs
@@ -107,8 +99,8 @@ class FitnessFunction:
                 if ((not self.FirstPosition) or index != self.StartIndex):
                     if self.TradeOnIntersection:
                         if (self.CrossFlag[IndividualCount] >= 0) or(self.DfFitness.capital[IndividualCount] + TmpDfFitness.profit[IndividualCount] - TmpDfFitness.deposit[IndividualCount] < 0):
-                            TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit']]
-            self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit']]
+                            TmpDfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]=self.DfFitness.loc[IndividualCount:IndividualCount,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
+            self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             if df.Flag[index] == 2:# clear daily holding profit
                 self.DfFitness.profit += self.DfFitness.holding * (df.Open[index] - df.Open[self.DailyFirstIndex])
                 #calculate riskFree
@@ -124,10 +116,10 @@ class FitnessFunction:
             plt.show()
             
     def getRreturn(self,df):
-        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  + (self.DfFitness.holding * df.High[self.EndIndex]) )/self.DfFitness.capital)
+        return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  )/self.DfFitness.capital)
     
     def getTotalAsset(self,df):
-        totalAsset= self.DfFitness.capital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost + (self.DfFitness.holding * df.High[self.EndIndex])
+        totalAsset= self.DfFitness.capital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost 
         print("Total asset is :",totalAsset[0])
         return totalAsset[0]
 
