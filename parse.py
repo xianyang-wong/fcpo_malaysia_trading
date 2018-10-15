@@ -52,61 +52,69 @@ parsed['Date'] = parsed['Date'].dt.date
 parsed['Time'] = pd.to_datetime(parsed['Time'],format='%H:%M:%S')
 parsed['Time'] = parsed['Time'].dt.time
 
-parsed['Flag'] = parsed['Date'].diff()
-parsed.loc[parsed.Date == parsed.Date.shift(-1), 'Flag'] = 0 # 0 for default
-parsed.loc[parsed.Date != parsed.Date.shift(), 'Flag'] = 1 # 1 for opening price
-parsed.loc[parsed.Date != parsed.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
-parsed['Datetime'] = pd.to_datetime(parsed['Date'].astype(str) + ' ' + parsed['Time'].astype(str))
+#parsed['Flag'] = parsed['Date'].diff()
+#parsed.loc[parsed.Date == parsed.Date.shift(-1), 'Flag'] = 0 # 0 for default
+#parsed.loc[parsed.Date != parsed.Date.shift(), 'Flag'] = 1 # 1 for opening price
+#parsed.loc[parsed.Date != parsed.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
+# parsed['Datetime'] = pd.to_datetime(parsed['Date'].astype(str) + ' ' + parsed['Time'].astype(str))
 
 parsed['HourTime'] = parsed['Time'].astype(str)
 parsed['HourTime'] = parsed['HourTime'].str.replace(':','')
 parsed['Hour_Minute'] = parsed['HourTime'].str[:4]
 parsed['Hour'] = parsed['HourTime'].str[:2]
 parsed['Minute'] = parsed['HourTime'].str[2:4]
-parsed.loc[(parsed.Minute.str.contains('00')), 'Flag'] = 3 # 3 for first entry for one hour
-parsed.loc[(parsed.Hour != parsed.Hour.shift(-1)) & (parsed.Date == parsed.Date.shift(-1)), 'Flag'] = 4 # 4 for last entry for one hour
+#parsed.loc[(parsed.Minute.str.contains('00')), 'Flag'] = 3 # 3 for first entry for one hour
+#parsed.loc[(parsed.Hour != parsed.Hour.shift(-1)) & (parsed.Date == parsed.Date.shift(-1)), 'Flag'] = 4 # 4 for last entry for one hour
 
-parsedByDay = parsed.loc[parsed.Flag != 0]
-parsedByDay = parsedByDay.reset_index(drop=True)
+#parsedByDay = parsed.loc[parsed.Flag != 0]
+#parsedByDay = parsedByDay.reset_index(drop=True)
 
-parsed = parsed[['Datetime','Date','Time','Open','High','Low','Close','Volume','Flag']]
+#parsed = parsed[['Datetime','Date','Time','Open','High','Low','Close','Volume','Flag']]
 
-parsedByDay = parsed.loc[(parsed.Flag == 1) | (parsed.Flag == 2)].copy()
-parsedByDay = parsedByDay.reset_index(drop=True)
-parsedByHour = parsed.loc[(parsed.Flag == 3) | (parsed.Flag == 4) | (parsed.Flag == 1) | (parsed.Flag == 2)].copy()
-parsedByHour.loc[parsedByHour.Date == parsedByHour.Date.shift(-1), 'Flag'] = 0 # 0 for rest
-parsedByHour.loc[parsedByHour.Date != parsedByHour.Date.shift(), 'Flag'] = 1 # 1 for opening price
-parsedByHour.loc[parsedByHour.Date != parsedByHour.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
-parsedByHour = parsedByHour.reset_index(drop=True)
-
+#parsedByDay = parsed.loc[(parsed.Flag == 1) | (parsed.Flag == 2)].copy()
+#parsedByDay = parsedByDay.reset_index(drop=True)
+#parsedByHour = parsed.loc[(parsed.Flag == 3) | (parsed.Flag == 4) | (parsed.Flag == 1) | (parsed.Flag == 2)].copy()
+#parsedByHour.loc[parsedByHour.Date == parsedByHour.Date.shift(-1), 'Flag'] = 0 # 0 for rest
+#parsedByHour.loc[parsedByHour.Date != parsedByHour.Date.shift(), 'Flag'] = 1 # 1 for opening price
+#parsedByHour.loc[parsedByHour.Date != parsedByHour.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
+#parsedByHour = parsedByHour.reset_index(drop=True)
 
 def saveDf (df,dfType):
         writer = pd.ExcelWriter(os.path.join(directory,'data/FCPO_6_years_NUS_'+ dfType +'.xlsx'), engine='xlsxwriter')
         df.to_excel(writer)
         writer.save()
+        
+# Correct Parsing of Daily Data #
+parsedDaily = parsed[['Date','Open','High','Low','Close','Volume']].groupby('Date').aggregate({'Open':'first',
+                                                                                               'High':'max',
+                                                                                               'Low':'min',
+                                                                                               'Close':'last',
+                                                                                               'Volume':'sum'}).reset_index()
 
+parsedHourly = parsed[['Date','Hour','Open','High','Low','Close','Volume']].groupby(['Date','Hour']).aggregate({'Open':'first',
+                                                                                                                'High':'max',
+                                                                                                                'Low':'min',
+                                                                                                                'Close':'last',
+                                                                                                                'Volume':'sum'}).reset_index()
+
+parsed = parsed[['Date','Hour','Minute','Open','High','Low','Close','Volume']].groupby(['Date','Hour','Minute']).aggregate({'Open':'first',
+                                                                                                                                'High':'max',
+                                                                                                                                'Low':'min',
+                                                                                                                                'Close':'last',
+                                                                                                                                'Volume':'sum'}).reset_index()
+
+
+parsed['Flag'] = parsed['Date'].diff()
+parsed.loc[parsed.Date == parsed.Date.shift(-1), 'Flag'] = 0 # 0 for default
+parsed.loc[parsed.Date != parsed.Date.shift(), 'Flag'] = 1 # 1 for opening price
+parsed.loc[parsed.Date != parsed.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
+
+parsedHourly['Flag'] = parsed['Date'].diff()
+parsedHourly.loc[parsedHourly.Date == parsedHourly.Date.shift(-1), 'Flag'] = 0 # 0 for default
+parsedHourly.loc[parsedHourly.Date != parsedHourly.Date.shift(), 'Flag'] = 1 # 1 for opening price
+parsedHourly.loc[parsedHourly.Date != parsedHourly.Date.shift(-1), 'Flag'] = 2 # 2 for closing price
 
 saveDf(parsed,'Parsed')
-saveDf(parsedByDay,'ParsedByDay')
-saveDf(parsedByHour,'ParsedByHour')
-
-# Correct Parsing of Daily Data #
-#parsedDaily = parsed[['Date','Open','High','Low','Close','Volume']].groupby('Date').aggregate({'Open':'first',
-#                                                                                               'High':'max',
-#                                                                                               'Low':'min',
-#                                                                                               'Close':'last',
-#                                                                                               'Volume':'sum'}).reset_index()
-
-#parsedHourly = parsed[['Date','Hour','Open','High','Low','Close','Volume']].groupby(['Date','Hour']).aggregate({'Open':'first',
-#                                                                                                                'High':'max',
-#                                                                                                                'Low':'min',
-#                                                                                                                'Close':'last',
-#                                                                                                                'Volume':'sum'}).reset_index()
-
-#parsedDaily = parsed[['Date','Hour','Minute','Open','High','Low','Close','Volume']].groupby(['Date','Hour','Minute']).aggregate({'Open':'first',
-#                                                                                                                                'High':'max',
-#                                                                                                                                'Low':'min',
-#                                                                                                                                'Close':'last',
-#                                                                                                                                'Volume':'sum'}).reset_index()
-
+saveDf(parsedDaily,'ParsedByDay')
+saveDf(parsedHourly,'ParsedByHour')
 
