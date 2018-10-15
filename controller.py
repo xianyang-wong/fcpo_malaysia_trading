@@ -25,24 +25,27 @@ TargetIndex=1000
 TradeWhenIntersection=True #set to True if only trade at intersection or False if trade at every data point
 dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
-    SubGroupSize = 200
+    SubGroupSize = 1000
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
 elif dfType == 2:
     SubGroupSize = 200
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByDay.xlsx'))
 elif dfType == 3:
     SubGroupSize=250
-    parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))    
+    parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))
 
+#noOfDays = parsed.groupby(['Date']).aggregate({'Date':'count'})
+#print('Number of Days: ', len(noOfDays))
 print('--------------')
 print("Total number of indexes: ",len(parsed))
-NumberOfGroups = int((len(parsed) / SubGroupSize) -3)
+# NumberOfGroups = int((len(parsed) / SubGroupSize) -3)
+NumberOfGroups = int(len(parsed) / 2 / SubGroupSize)
 print("Total number of groups: ",NumberOfGroups)
 print('--------------')
 
 dfTmp = parsed[parsed['Date']== '2014-01-02']
 TargetIndex = dfTmp.index.values[0]
-print('Test Index: ',TargetIndex)
+print('Target Index: ',TargetIndex)
 
 y1=TargetIndex-(SubGroupSize* 3)
 y2=0
@@ -71,10 +74,10 @@ for i in range (0,NumberOfGroups):
     print('Begin of training SubGroup: '+ str(y1))
     print('Begin of select SubGroup: '+ str(y2))
     print('Begin of testing SubGroup: '+ str(y3))
+    print('End of testing SubGroup: '+ str(y4))
     if (y4+SubGroupSize)>len(parsed):
         y4=len(parsed)-1
-        print('End of testing SubGroup: '+ str(y4)) 
-        break
+        print('Final end of testing SubGroup: '+ str(y4))
     #Apply first random rule on training section
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
@@ -104,6 +107,8 @@ for i in range (0,NumberOfGroups):
     totalAsset = FF.getTotalAsset(parsed.loc[:,:])
     totalAssets.append(totalAsset)
     print("End of group: ",i+1,datetime.datetime.now())
+    if y4==(len(parsed)-1):
+        break
     print("--------------------------------------")
 
 print(len(totalAssets))
@@ -118,7 +123,7 @@ df.to_excel(writer)
 writer.save()
 
 
-plt.plot(totalAssets)
-plt.ylabel('Total Assets')
-plt.xlabel('Group')
-plt.show()
+#plt.plot(totalAssets)
+#plt.ylabel('Total Assets')
+#plt.xlabel('Group')
+#plt.show()
