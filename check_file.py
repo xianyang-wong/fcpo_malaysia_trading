@@ -19,8 +19,9 @@ for day in range(0,daily1415.shape[0]):
         current_status = [0, 0, 0, 10000000]  # [holding, initial holding price,deposit, cash]
     """"""
     # NEED TO ADD
-    # everyday check if position moves out of deposit
-    # if losses above deposit close out position
+    # everyday check if got short position
+    # if there is pay interest on short position
+    # adjust short holdings such that total marked to market value is maximum of RM 5million
     """"""
 
     if daily1415['trade_flag'][day]==1:
@@ -73,5 +74,3 @@ for day in range(0,daily1415.shape[0]):
     # Calculate Annualized Sharpe Ratio
     """"""
     return (current_records, cumulative returns, annualized returns, annualized sharpe ratio)
-    
-    
