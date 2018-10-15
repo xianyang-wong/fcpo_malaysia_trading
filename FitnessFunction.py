@@ -137,7 +137,7 @@ class FitnessFunction:
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate daily profit
-            #self.DfFitness.profit += self.DfFitness.holding * (df.Close[index] - df.Open[index])
+            self.DfFitness.profit += self.DfFitness.holding * (df.Close[index] - df.Open[index])
             self.tmpLog.append(self.DfFitness.holding[0])
             self.tmpLog.append(self.DfFitness.deposit[0])
             self.tmpLog.append((self.DfFitness.holding * (df.Close[index] - df.Open[index]))[0])
