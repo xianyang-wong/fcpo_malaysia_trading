@@ -164,9 +164,10 @@ class FitnessFunction:
             
             
     def getRreturn(self,df):
-        #for IndividualCount in range(0,20):  
-        #    if self.DfFitness.holding[IndividualCount] !=0:
-        #        self.DfFitness..iloc[IndividualCount]['profit'] += self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+        tmpProfit = self.DfFitness.loc[:, ['profit']]
+        for IndividualCount in range(0,20):  
+            if self.DfFitness.holding[IndividualCount] !=0:
+                tmpProfit.iloc[IndividualCount]['profit'] += self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
         return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  )/self.DfFitness.capital)
     
     def getTotalAsset(self,df):
