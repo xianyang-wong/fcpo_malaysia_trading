@@ -36,13 +36,11 @@ for day in range(0,daily1415.shape[0]):
         else:
             change_in_position = np.abs(trade_signal_holding - current_status[0])
         """"""
-
         """"""
         # NEED TO ADD
         # cost of trade if long
         # deposit if long
         """"""
-
         """"""
         # NEED TO ADD
         # cost of trade if short
@@ -57,7 +55,23 @@ for day in range(0,daily1415.shape[0]):
         # NEED TO ADD
         # Append current_status to current_records with Daily Date
         """"""
+      """"""
+      # NEED TO ADD
+      # Append current_status to current_records with Daily Date
+      """"""
     """"""
     # NEED TO ADD
-    # Append current_status to current_records with Daily Date
+    # Merge on daily Open, Close, High, Low to current_records
+    # Calculate Marked to Market Value for each day
+    # Calculate Profit / Loss for each day
+    # Calculate % Returns for Each day
     """"""
+    """"""
+    # NEED TO ADD
+    # Calculate Cumulative Returns
+    # Calculate Annualized Returns
+    # Calculate Annualized Sharpe Ratio
+    """"""
+    return (current_records, cumulative returns, annualized returns, annualized sharpe ratio)
+    
+    
