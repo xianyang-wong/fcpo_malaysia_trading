@@ -131,20 +131,28 @@ class FitnessFunction:
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate daily profit
             self.DfFitness.profit += self.DfFitness.holding * (df.Close[index] - df.Open[index])
+
+            #calculate riskFree
+            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
             self.tmpLog.append(self.DfFitness.holding[0])
             self.tmpLog.append(self.DfFitness.deposit[0])
             self.tmpLog.append((self.DfFitness.holding * (df.Close[index] - df.Open[index]))[0])
             self.tmpLog.append(self.DfFitness.riskfree[0])
             self.tmpLog.append(self.DfFitness.cost[0])
-            #calculate riskFree
-            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
+            closeProfit=0
+            if self.DfFitness.holding[0] !=0:
+                closeProfit = self.DfFitness.iloc[0]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[0]['lastTradeValue'])
+            totalAsset= self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0]+closeProfit
+            self.tmpLog.append(totalAsset)
+            
+            
             self.tmpPlot.append(self.CrossFlag[0]*100)
             self.tmpPlot.append(self.DfFitness.holding[0])
             self.tmpPlot.append(df.Date[index])
             self.ForPlot.append(self.tmpPlot)
             self.TradeLog.append(self.tmpLog)
         self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding','date'])
-        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','HoldProfit','riskfree','cost'])
+        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','HoldProfit','riskfree','cost','totalAsset'])
         if PlotHolding:
             self.HoldingPlot.set_index('index').plot(y=['intersect','holding'],figsize=(10,5), grid=True)
             savefile = "HoldingPlot" + str(index)   # file might need to be replaced by a string
