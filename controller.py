@@ -17,11 +17,9 @@ import matplotlib.pyplot as plt
 directory = ''
 
 #configuration parameters.
-<<<<<<< HEAD
-GA_Iterations=2
-=======
+
 GA_Iterations=20
->>>>>>> 264e25f275ca2eeede88db7f8eeecae49d2d1c0d
+
 #SubGroupSize=0# No need to change
 TargetIndex=1000
 TradeWhenIntersection=True #set to True if only trade at intersection or False if trade at every data point

@@ -19,8 +19,9 @@ for day in range(0,daily1415.shape[0]):
         current_status = [0, 0, 0, 10000000]  # [holding, initial holding price,deposit, cash]
     """"""
     # NEED TO ADD
-    # everyday check if position moves out of deposit
-    # if losses above deposit close out position
+    # everyday check if got short position
+    # if there is pay interest on short position
+    # adjust short holdings such that total marked to market value is maximum of RM 5million
     """"""
 
     if daily1415['trade_flag'][day]==1:
@@ -36,13 +37,11 @@ for day in range(0,daily1415.shape[0]):
         else:
             change_in_position = np.abs(trade_signal_holding - current_status[0])
         """"""
-
         """"""
         # NEED TO ADD
         # cost of trade if long
         # deposit if long
         """"""
-
         """"""
         # NEED TO ADD
         # cost of trade if short
@@ -57,7 +56,21 @@ for day in range(0,daily1415.shape[0]):
         # NEED TO ADD
         # Append current_status to current_records with Daily Date
         """"""
+      """"""
+      # NEED TO ADD
+      # Append current_status to current_records with Daily Date
+      """"""
     """"""
     # NEED TO ADD
-    # Append current_status to current_records with Daily Date
+    # Merge on daily Open, Close, High, Low to current_records
+    # Calculate Marked to Market Value for each day
+    # Calculate Profit / Loss for each day
+    # Calculate % Returns for Each day
     """"""
+    """"""
+    # NEED TO ADD
+    # Calculate Cumulative Returns
+    # Calculate Annualized Returns
+    # Calculate Annualized Sharpe Ratio
+    """"""
+    return (current_records, cumulative returns, annualized returns, annualized sharpe ratio)
