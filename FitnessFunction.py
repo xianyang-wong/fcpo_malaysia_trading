@@ -102,7 +102,7 @@ class FitnessFunction:
                             TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] - HoldingDiff *(currentTradePrice  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'] )
                             self.profitflag[IndividualCount] =2
                         else:
-                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['lastTradeValue']
+                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit']
                             TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] =  (self.DfFitness.iloc[IndividualCount]['holding'] * self.DfFitness.iloc[IndividualCount]['lastTradeValue'] + abs(HoldingDiff) * currentTradePrice) / TmpDfFitness.iloc[IndividualCount]['holding']
                             self.profitflag[IndividualCount]=3
                 else:
