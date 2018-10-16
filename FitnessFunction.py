@@ -130,7 +130,7 @@ class FitnessFunction:
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate riskFree
-            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit  ) / 365
+            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit - self.DfFitness.cost ) / 365
             self.tmpLog.append(self.DfFitness.holding[0])
             self.tmpLog.append(self.DfFitness.deposit[0])
             self.tmpLog.append(self.DfFitness.riskfree[0])
@@ -143,6 +143,7 @@ class FitnessFunction:
             totalAsset= self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0]+closeProfit
             self.tmpLog.append(closeProfit)
             self.tmpLog.append(totalAsset)
+            self.tmpLog.append(ListInitialState[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0] - self.DfFitness.deposit[0])
             self.tmpLog.append(self.DfFitness.lastTradeValue[0])
             
             self.tmpPlot.append(self.CrossFlag[0]*100)
@@ -151,7 +152,7 @@ class FitnessFunction:
             self.ForPlot.append(self.tmpPlot)
             self.TradeLog.append(self.tmpLog)
         self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding','date'])
-        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','riskfree','cost','closeProfit','totalAsset','price on hand'])
+        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','riskfree','cost','closeProfit','totalAsset','Cash','price on hand'])
         if PlotHolding:
             self.HoldingPlot.set_index('index').plot(y=['intersect','holding'],figsize=(10,5), grid=True)
             savefile = "HoldingPlot" + str(index)   # file might need to be replaced by a string
