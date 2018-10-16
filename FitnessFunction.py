@@ -90,8 +90,6 @@ class FitnessFunction:
                     self.DfFitness.iloc[IndividualCount]['cost'] += max((abs(self.DfFitness.iloc[IndividualCount]['holding']) * self.DfFitness.iloc[IndividualCount]['lastTradeValue'] * 0.002),self.minTradeCost)
                     
                     if IndividualCount == 0:
-                        print(self.DfFitness.loc[0, :])
-                        print(self.DfFitness.iloc[IndividualCount]['holding'])
                         self.tmpLog.append('Yes')
                         #Log and plot part
                         self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['profit'])
