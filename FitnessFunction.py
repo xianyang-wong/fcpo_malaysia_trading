@@ -81,15 +81,18 @@ class FitnessFunction:
             #Check if get close out
             for IndividualCount in range(0,20):    
                 closeProfit=0
+                CostModifier=0
                 if self.DfFitness.holding[IndividualCount] > 0:
+                    CostModifier = -200
                     closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
                 else:
+                    CostModifier = 200
                     closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
                     
                 if closeProfit + self.DfFitness.iloc[IndividualCount]['deposit'] < 0:# check out!! 
                     self.DfFitness.iloc[IndividualCount]['capital'] -= self.DfFitness.iloc[IndividualCount]['deposit']
                     self.DfFitness.iloc[IndividualCount]['deposit'] = 0
-                    self.DfFitness.iloc[IndividualCount]['cost'] += max((abs(self.DfFitness.iloc[IndividualCount]['holding']) * self.DfFitness.iloc[IndividualCount]['lastTradeValue'] * 0.002),self.minTradeCost)
+                    self.DfFitness.iloc[IndividualCount]['cost'] += max((abs(self.DfFitness.iloc[IndividualCount]['holding']) * (self.DfFitness.iloc[IndividualCount]['lastTradeValue']+CostModifier) * 0.002),self.minTradeCost)
                     
                     if IndividualCount == 0:
                         self.tmpLog.append('Yes')
