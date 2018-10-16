@@ -77,7 +77,7 @@ class FitnessFunction:
             #Dataframe stores valeus to calculate fitness function at current moment.
 
             #Calculate holding
-            TmpDfFitness['holding'] = (((self.DfFitness['capital'] + self.DfFitness['profit'] - self.DfFitness['deposit']- self.DfFitness['cost']) /(df.High[index] * self.Deposit))* self.DfRlevel).round()
+            TmpDfFitness['holding'] = (((self.DfFitness['capital'] + self.DfFitness['profit'] - self.DfFitness['deposit']- self.DfFitness['cost']) /5000)* self.DfRlevel).round()#Easier way#(df.High[index] * self.Deposit))* self.DfRlevel).round()
             #Calculate Profit and cost since it is affected by buy or sell option.
             flag =np.zeros(20)
             for IndividualCount in range(0,20):           
@@ -111,7 +111,7 @@ class FitnessFunction:
                     TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit']
                     flag[IndividualCount]=4
                 #calculate deposit
-                TmpDfFitness.iloc[IndividualCount]['deposit'] = abs(TmpDfFitness.iloc[IndividualCount]['holding']) * TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] * self.Deposit
+                TmpDfFitness.iloc[IndividualCount]['deposit'] = abs(TmpDfFitness.iloc[IndividualCount]['holding']) * 5000#Use easier way#TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] * self.Deposit
             #calculate risk-free
             TmpDfFitness['riskfree'] = self.DfFitness.riskfree
             #accumulate costs
@@ -137,9 +137,9 @@ class FitnessFunction:
             self.tmpLog.append(self.DfFitness.cost[0])
             closeProfit=0
             if self.DfFitness.holding[0] > 0:
-                closeProfit = self.DfFitness.iloc[0]['holding'] * (df.Low[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
+                closeProfit = 25 *self.DfFitness.iloc[0]['holding'] * (df.Low[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
             else:
-                closeProfit = self.DfFitness.iloc[0]['holding'] * (df.High[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
+                closeProfit = 25 *self.DfFitness.iloc[0]['holding'] * (df.High[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
             totalAsset= self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0]+closeProfit
             self.tmpLog.append(closeProfit)
             self.tmpLog.append(totalAsset)
@@ -167,17 +167,17 @@ class FitnessFunction:
         tmpProfit = self.DfFitness.loc[:, ['profit']]
         for IndividualCount in range(0,20):  
             if self.DfFitness.holding[IndividualCount] > 0:
-                tmpProfit.iloc[IndividualCount]['profit'] += self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                tmpProfit.iloc[IndividualCount]['profit'] += 25 * self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
             else:
-                tmpProfit.iloc[IndividualCount]['profit'] += self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                tmpProfit.iloc[IndividualCount]['profit'] += 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
         return ((self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost  )/self.DfFitness.capital)
     
     def getTotalAsset(self,df):
         closeProfit=0
         if self.DfFitness.holding[0] > 0:
-            closeProfit = self.DfFitness.iloc[0]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[0]['lastTradeValue'])
+            closeProfit = 25 *self.DfFitness.iloc[0]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[0]['lastTradeValue'])
         else:
-            closeProfit = self.DfFitness.iloc[0]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[0]['lastTradeValue'])
+            closeProfit = 25 *self.DfFitness.iloc[0]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[0]['lastTradeValue'])
         totalAsset= self.DfFitness.capital + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost 
         print("Total asset is :",totalAsset[0]+closeProfit)
         return totalAsset[0]+closeProfit
