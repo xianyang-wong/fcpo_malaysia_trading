@@ -76,6 +76,48 @@ class FitnessFunction:
             TmpDfFitness = pd.DataFrame(np.array([ListInitialState[0],0,0,0,0,0,0]*20).reshape(20,7),columns=['capital','profit','holding','cost','riskfree','deposit','lastTradeValue'])
             #Dataframe stores valeus to calculate fitness function at current moment.
 
+            #Check if get close out
+            for IndividualCount in range(0,20):    
+                closeProfit=0
+                if self.DfFitness.holding[IndividualCount] > 0:
+                    closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                else:
+                    closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                    
+                if closeProfit + self.DfFitness.iloc[IndividualCount]['deposit'] < 0:# check out!! 
+                    self.DfFitness.iloc[IndividualCount]['capital'] -= self.DfFitness.iloc[IndividualCount]['deposit']
+                    self.DfFitness.iloc[IndividualCount]['deposit'] = 0
+                    self.DfFitness.iloc[IndividualCount]['cost'] += max((abs(self.DfFitness.iloc[IndividualCount]['holding']) * self.DfFitness.iloc[IndividualCount]['lastTradeValue'] * 0.002),self.minTradeCost)
+                    
+                    if IndividualCount == 0:
+                        print(self.DfFitness.loc[0, :])
+                        print(self.DfFitness.iloc[IndividualCount]['holding'])
+                        self.tmpLog.append('Yes')
+                        #Log and plot part
+                        self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['profit'])
+                        self.tmpLog.append(0)
+                        self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['deposit'])
+                        self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['riskfree'])
+                        self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['cost'])
+                        closeProfit=0
+                        if self.DfFitness.iloc[IndividualCount]['holding'] > 0:
+                            closeProfit = 25 *self.DfFitness.iloc[0]['holding'] * (df.Low[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
+                        else:
+                            closeProfit = 25 *self.DfFitness.iloc[0]['holding'] * (df.High[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
+                        totalAsset= self.DfFitness.iloc[IndividualCount]['capital'] + self.DfFitness.iloc[IndividualCount]['profit'] + self.DfFitness.iloc[IndividualCount]['riskfree'] - self.DfFitness.iloc[IndividualCount]['cost']+closeProfit
+                        self.tmpLog.append(0)
+                        self.tmpLog.append(totalAsset)
+                        self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['capital'] + self.DfFitness.iloc[IndividualCount]['profit'] + self.DfFitness.iloc[IndividualCount]['riskfree'] - self.DfFitness.iloc[IndividualCount]['cost'] - self.DfFitness.iloc[IndividualCount]['deposit'])
+                        self.tmpLog.append(self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                        self.TradeLog.append(self.tmpLog) 
+                        self.tmpLog=[]
+                        self.tmpLog.append(index)
+                        self.tmpLog.append('Yes')
+                    self.DfFitness.iloc[IndividualCount]['holding'] = 0
+                else:
+                    if IndividualCount == 0:
+                        self.tmpLog.append('No')
+
             #Calculate holding
             TmpDfFitness['holding'] = (((self.DfFitness['capital'] + self.DfFitness['profit'] - self.DfFitness['deposit']- self.DfFitness['cost']) /5000)* self.DfRlevel).round()#Easier way#(df.High[index] * self.Deposit))* self.DfRlevel).round()
             #Calculate Profit and cost since it is affected by buy or sell option.
@@ -131,18 +173,7 @@ class FitnessFunction:
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate riskFree
             self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit - self.DfFitness.cost ) / 365
-            #Check if get close out
-            for IndividualCount in range(0,20):    
-                closeProfit=0
-                if self.DfFitness.holding[IndividualCount] > 0:
-                    closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
-                else:
-                    closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
-                if closeProfit + self.DfFitness.iloc[IndividualCount]['deposit'] < 0:# check out!! 
-                    self.DfFitness.iloc[IndividualCount]['capital'] -= self.DfFitness.iloc[IndividualCount]['deposit']
-                    self.DfFitness.iloc[IndividualCount]['deposit'] = 0
-                    self.DfFitness.iloc[IndividualCount]['cost'] += max((abs(self.DfFitness.iloc[IndividualCount]['holding']) * self.DfFitness.iloc[IndividualCount]['lastTradeValue'] * 0.002),self.minTradeCost)
-                    self.DfFitness.iloc[IndividualCount]['holding'] = 0
+           
                     
             
             #Log and plot part
@@ -160,14 +191,15 @@ class FitnessFunction:
             self.tmpLog.append(totalAsset)
             self.tmpLog.append(self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0] - self.DfFitness.deposit[0])
             self.tmpLog.append(self.DfFitness.lastTradeValue[0])
+            self.TradeLog.append(self.tmpLog)
             
             self.tmpPlot.append(self.CrossFlag[0]*100)
             self.tmpPlot.append(self.DfFitness.holding[0])
             self.tmpPlot.append(df.Date[index])
             self.ForPlot.append(self.tmpPlot)
-            self.TradeLog.append(self.tmpLog)
+            
         self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding','date'])
-        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','riskfree','cost','closeProfit','totalAsset','Cash','price on hand'])
+        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Close out','Profit','Holding','Deposit','riskfree','cost','closeProfit','totalAsset','Cash','price on hand'])
         if PlotHolding:
             self.HoldingPlot.set_index('index').plot(y=['intersect','holding'],figsize=(10,5), grid=True)
             savefile = "HoldingPlot" + str(index)   # file might need to be replaced by a string
