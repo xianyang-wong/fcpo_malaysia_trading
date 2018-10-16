@@ -65,6 +65,8 @@ class FitnessFunction:
                         tmpList.append(recommandValue* rule[3])
                     tmpMA.append(MAd)
                 rlevelList.append(self.Average(tmpList))
+                if len(tmpMA) == 0:
+                    tmpMA.append(0)
                 MA_List.append(self.Average(tmpMA))
             self.DfRlevel = pd.DataFrame(rlevelList)#Dataframe that stores rlevel values for all 20 individuals
             #CrossFlag is used to determin if intersection happens.Possitive means no and Negative means intersection happens.
@@ -170,9 +172,7 @@ class FitnessFunction:
             self.DfFitness = TmpDfFitness[['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate riskFree
-            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit - self.DfFitness.cost ) / 365
-           
-                    
+            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost ) / 365
             
             #Log and plot part
             self.tmpLog.append(self.DfFitness.holding[0])
