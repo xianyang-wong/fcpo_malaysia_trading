@@ -131,6 +131,21 @@ class FitnessFunction:
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate riskFree
             self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit - self.DfFitness.cost ) / 365
+            #Check if get close out
+            for IndividualCount in range(0,20):    
+                closeProfit=0
+                if self.DfFitness.holding[IndividualCount] > 0:
+                    closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                else:
+                    closeProfit = 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[index]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                if closeProfit + self.DfFitness.iloc[IndividualCount]['deposit'] < 0:# check out!! 
+                    self.DfFitness.iloc[IndividualCount]['capital'] -= self.DfFitness.iloc[IndividualCount]['deposit']
+                    self.DfFitness.iloc[IndividualCount]['deposit'] = 0
+                    self.DfFitness.iloc[IndividualCount]['cost'] += max((abs(self.DfFitness.iloc[IndividualCount]['holding']) * self.DfFitness.iloc[IndividualCount]['lastTradeValue'] * 0.002),self.minTradeCost)
+                    self.DfFitness.iloc[IndividualCount]['holding'] = 0
+                    
+            
+            #Log and plot part
             self.tmpLog.append(self.DfFitness.holding[0])
             self.tmpLog.append(self.DfFitness.deposit[0])
             self.tmpLog.append(self.DfFitness.riskfree[0])
@@ -143,7 +158,7 @@ class FitnessFunction:
             totalAsset= self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0]+closeProfit
             self.tmpLog.append(closeProfit)
             self.tmpLog.append(totalAsset)
-            self.tmpLog.append(ListInitialState[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0] - self.DfFitness.deposit[0])
+            self.tmpLog.append(self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0] - self.DfFitness.deposit[0])
             self.tmpLog.append(self.DfFitness.lastTradeValue[0])
             
             self.tmpPlot.append(self.CrossFlag[0]*100)
