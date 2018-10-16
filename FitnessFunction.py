@@ -135,13 +135,13 @@ class FitnessFunction:
                 if self.DfFitness.iloc[IndividualCount]['holding'] != 0:
                     if (TmpDfFitness.iloc[IndividualCount]['holding'] == 0) or ((TmpDfFitness.iloc[IndividualCount]['holding'] * self.DfFitness.iloc[IndividualCount]['holding']) < 0):
                         #close previous position
-                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + self.DfFitness.iloc[IndividualCount]['holding'] * (currentTradePrice  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                        TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + 25*self.DfFitness.iloc[IndividualCount]['holding'] * (currentTradePrice  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
                         TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] =  currentTradePrice
                         flag[IndividualCount]=1
                     else:
                         #calculate profit if holding has same sign
                         if abs(TmpDfFitness.iloc[IndividualCount]['holding']) < abs(self.DfFitness.iloc[IndividualCount]['holding']):
-                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + HoldingDiff *(currentTradePrice  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'] )
+                            TmpDfFitness.iloc[IndividualCount]['profit'] = self.DfFitness.iloc[IndividualCount]['profit'] + 25*HoldingDiff *(currentTradePrice  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'] )
                             TmpDfFitness.iloc[IndividualCount]['lastTradeValue'] = self.DfFitness.iloc[IndividualCount]['lastTradeValue']
                             flag[IndividualCount]=2
                         else:
