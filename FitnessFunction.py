@@ -136,9 +136,12 @@ class FitnessFunction:
             self.tmpLog.append(self.DfFitness.riskfree[0])
             self.tmpLog.append(self.DfFitness.cost[0])
             closeProfit=0
-            if self.DfFitness.holding[0] !=0:
-                closeProfit = self.DfFitness.iloc[0]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[0]['lastTradeValue'])
+            if self.DfFitness.holding[0] > 0:
+                closeProfit = self.DfFitness.iloc[0]['holding'] * (df.Low[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
+            else:
+                closeProfit = self.DfFitness.iloc[0]['holding'] * (df.High[index]  - self.DfFitness.iloc[0]['lastTradeValue'])
             totalAsset= self.DfFitness.capital[0] + self.DfFitness.profit[0] + self.DfFitness.riskfree[0] - self.DfFitness.cost[0]+closeProfit
+            self.tmpLog.append(closeProfit)
             self.tmpLog.append(totalAsset)
             self.tmpLog.append(self.DfFitness.lastTradeValue[0])
             
@@ -148,7 +151,7 @@ class FitnessFunction:
             self.ForPlot.append(self.tmpPlot)
             self.TradeLog.append(self.tmpLog)
         self.HoldingPlot = pd.DataFrame(self.ForPlot,columns=['index','prince','intersect','holding','date'])
-        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','riskfree','cost','totalAsset','price on hand'])
+        self.TRlog = pd.DataFrame(self.TradeLog,columns=['index','Profit','Holding','Deposit','riskfree','cost','closeProfit','totalAsset','price on hand'])
         if PlotHolding:
             self.HoldingPlot.set_index('index').plot(y=['intersect','holding'],figsize=(10,5), grid=True)
             savefile = "HoldingPlot" + str(index)   # file might need to be replaced by a string
