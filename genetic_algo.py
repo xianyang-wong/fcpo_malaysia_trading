@@ -50,7 +50,8 @@ def roulette_wheel(collection, fitness, topn):
     relative_fitness = [f / total_fit for f in fitness]
 
     dictionary = dict(zip(range(0,20),relative_fitness))
-    dictionary = dict(sorted(dictionary.items(), key = operator.itemgetter(1), reverse=True))
+    #dictionary = dict(sorted(dictionary.items(), key=itemgetter(1), reverse=True))
+    dictionary = dict(sorted(dictionary.items(), key=lambda x: (-x[1], x[0])))
 
     chosen = []
     while len(chosen) in range(topn):
