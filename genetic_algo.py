@@ -7,6 +7,7 @@ Created on Sun Sep 23 16:52:22 2018
 import itertools
 import numpy as np
 import random
+import operator
 
 def generate_rule(rule_choices):
     
@@ -45,21 +46,27 @@ def generate_collection(n_rulesets, n_rules, rule_choices):
     return collection
 
 def roulette_wheel(collection, fitness, topn):
-
     total_fit = float(sum(fitness))
-    relative_fitness = [f/total_fit for f in fitness]
-    probabilities = [sum(relative_fitness[:i+1]) 
-                     for i in range(len(relative_fitness))]
+    relative_fitness = [f / total_fit for f in fitness]
+
+    dictionary = dict(zip(range(0,20),relative_fitness))
+    dictionary = dict(sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True))
 
     chosen = []
     for n in range(topn):
         r = random.random()
-        for (i, ruleset) in enumerate(collection):
-            if r <= probabilities[i]:
-                chosen.append(list(ruleset))
+        current = 0
+        for key, value in dictionary.items():
+            current += value
+            if (current > r) & (key not in chosen):
+                chosen.append(key)
                 break
-            
-    return chosen
+
+    chosen_collection = []
+    for choice in chosen:
+        chosen_collection.append(collection[choice])
+
+    return chosen_collection
 
 def crossover(iteration_best80pct, crossover_pct):
     

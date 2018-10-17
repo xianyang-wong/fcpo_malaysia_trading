@@ -12,13 +12,14 @@ import os
 import datetime
 import Fuzzy_Logic as fuzzy
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 1
+
+GA_Iterations= 2
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
