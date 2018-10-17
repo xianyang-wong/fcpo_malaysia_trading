@@ -18,12 +18,12 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 30
+GA_Iterations= 1
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
 TradeWhenIntersection=True #set to True if only trade at intersection or False if trade at every data point
-dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
+dfType = 1 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
     SubGroupSize = 1000
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
