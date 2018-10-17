@@ -13,18 +13,20 @@ import datetime
 import Fuzzy_Logic as fuzzy
 import matplotlib.pyplot as plt
 import numpy as np
+import itertools
+import random
+
 
 directory = ''
 
 #configuration parameters.
-
 
 GA_Iterations= 2
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
 TradeWhenIntersection=True #set to True if only trade at intersection or False if trade at every data point
-dfType = 1 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
+dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
 if dfType == 1:
     SubGroupSize = 1000
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_Parsed.xlsx'))
@@ -84,7 +86,7 @@ for i in range (0,NumberOfGroups):
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
     result = FF.getRreturn(parsed.loc[:,:])
-    Collection = genetic_algo.evolve(Collection, rule_choices, [0 if i < 0 else i for i in result.values], 0.7, 0.01)
+    #Collection = genetic_algo.evolve(Collection, rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
 
     BestReturn=-10
     BestIndividual=[[]]
@@ -94,8 +96,10 @@ for i in range (0,NumberOfGroups):
     iteration_final_values_max = []
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
+        if j == 0:
+            collection_records = [Collection]
         print("Processing GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         result = FF.getRreturn(parsed.loc[:,:])
         #print(result)
         if BestReturn < result.max(skipna=True):
@@ -105,7 +109,10 @@ for i in range (0,NumberOfGroups):
 
         iteration_final_values.append(result.values)
         iteration_final_values_max.append(result.values.max())
-        Collection = genetic_algo.evolve(Collection, rule_choices, [0 if i < 0 else i for i in result.values], 0.7, 0.01)
+        Collection = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
+        collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
+        collection_records.append(collection_new)
+
 
     iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1,GA_Iterations+1),
                                               'Fitness Values': iteration_final_values,
@@ -143,3 +150,8 @@ writer.save()
 #plt.ylabel('Total Assets')
 #plt.xlabel('Group')
 #plt.show()
+
+### CHECK OF COLLECTION RECORDS
+for j in range(0,len(collection_records[0])):
+    if collection_records[1][j] in collection_records[0]:
+        print(j)
