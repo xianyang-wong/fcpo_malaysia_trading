@@ -48,17 +48,24 @@ def roulette_wheel(collection, fitness, topn):
     total_fit = float(sum(fitness))
     relative_fitness = [f / total_fit for f in fitness]
 
+    dictionary = dict(zip(range(0,20),relative_fitness))
+    dictionary = dict(sorted(dictionary.items(), key=operator.itemgetter(1)))
+
     chosen = []
     for n in range(topn):
         r = random.random()
         current = 0
-        for (i, ruleset) in enumerate(collection):
-            current += relative_fitness[i]
-            if (r <= current) & (ruleset not in chosen):
-                chosen.append(list(ruleset))
+        for key, value in dictionary.items():
+            current += value
+            if current > r:
+                chosen.append(key)
                 break
 
-    return chosen
+    chosen_collection = []
+    for choice in chosen:
+        chosen_collection.append(collection[choice])
+
+    return chosen_collection
 
 def crossover(iteration_best80pct, crossover_pct):
     
