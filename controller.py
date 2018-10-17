@@ -18,7 +18,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations=50
+GA_Iterations= 5
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
@@ -55,6 +55,7 @@ y4=0
 totalAssets = []
 AccountStatus = [10000000.0,0,0,0,0,0,0]
 FirstPosition = True
+
 for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i != 0:
@@ -82,10 +83,14 @@ for i in range (0,NumberOfGroups):
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
     result = FF.getRreturn(parsed.loc[:,:])
-    Collection = genetic_algo.evolve(Collection, rule_choices, result.values, 0.7, 0.01)
+    Collection = genetic_algo.evolve(Collection, rule_choices, (1+ result.values) * 10000000, 0.7, 0.01)
+
     BestReturn=-10
     BestIndividual=[[]]
     rreturnLog=[]
+
+    iteration_final_values = []
+    iteration_final_values_max = []
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         print("Processing GA iteration ",j)
@@ -96,8 +101,18 @@ for i in range (0,NumberOfGroups):
             BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
             rreturnLog.append(result.max(skipna=True))
             BestReturn = result.max(skipna=True)
-        
-        Collection = genetic_algo.evolve(Collection, rule_choices, result.values, 0.7, 0.01)
+
+        iteration_final_values.append(result.values)
+        iteration_final_values_max.append(result.values.max())
+        Collection = genetic_algo.evolve(Collection, rule_choices, (1+ result.values) * 10000000, 0.7, 0.01)
+
+    iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1,GA_Iterations+1),
+                                              'Fitness Values': iteration_final_values,
+                                              'Max Fitness Value': iteration_final_values_max})
+
+    if i == 0:
+        iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
+
     #Apply best individual to test section then record total asset.
     print(rreturnLog)
     Collection = BestIndividual
@@ -107,7 +122,7 @@ for i in range (0,NumberOfGroups):
     totalAsset = FF.getTotalAsset(parsed.loc[:,:])
     totalAssets.append(totalAsset)
     print("End of group: ",i+1,datetime.datetime.now())
-    if y4==(len(parsed)-1):
+    if y4 == (len(parsed)-1):
         break
     print("--------------------------------------")
 
