@@ -152,6 +152,10 @@ writer.save()
 #plt.show()
 
 ### CHECK OF COLLECTION RECORDS
-for j in range(0,len(collection_records[0])):
-    if collection_records[1][j] in collection_records[0]:
-        print(j)
+for c in range(0,len(collection_records[0])):
+    if collection_records[1][c] in collection_records[0]:
+        print(c)
+        
+for f in range(0,len(iteration_final_values_df['Fitness Values'][0])):
+    if iteration_final_values_df['Fitness Values'][1][f] in iteration_final_values_df['Fitness Values'][0]:
+        print(f)
