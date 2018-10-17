@@ -7,6 +7,7 @@ Created on Sun Sep 23 16:52:22 2018
 import itertools
 import numpy as np
 import random
+import operator
 
 def generate_rule(rule_choices):
     
@@ -49,7 +50,7 @@ def roulette_wheel(collection, fitness, topn):
     relative_fitness = [f / total_fit for f in fitness]
 
     dictionary = dict(zip(range(0,20),relative_fitness))
-    dictionary = dict(sorted(dictionary.items(), key=operator.itemgetter(1)))
+    dictionary = dict(sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True))
 
     chosen = []
     for n in range(topn):
