@@ -45,20 +45,19 @@ def generate_collection(n_rulesets, n_rules, rule_choices):
     return collection
 
 def roulette_wheel(collection, fitness, topn):
-
     total_fit = float(sum(fitness))
-    relative_fitness = [f/total_fit for f in fitness]
-    probabilities = [sum(relative_fitness[:i+1]) 
+    relative_fitness = [f / total_fit for f in fitness]
+    probabilities = [sum(relative_fitness[:i + 1])
                      for i in range(len(relative_fitness))]
 
     chosen = []
     for n in range(topn):
         r = random.random()
         for (i, ruleset) in enumerate(collection):
-            if r <= probabilities[i]:
+            if (r <= probabilities[i]) & (ruleset not in chosen):
                 chosen.append(list(ruleset))
                 break
-            
+
     return chosen
 
 def crossover(iteration_best80pct, crossover_pct):
