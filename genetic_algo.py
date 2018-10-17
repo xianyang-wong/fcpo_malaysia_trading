@@ -5,9 +5,7 @@ Created on Sun Sep 23 16:52:22 2018
 @author: XY
 """
 import itertools
-import numpy as np
 import random
-import operator
 
 def generate_rule(rule_choices):
     
@@ -20,8 +18,6 @@ def generate_rule(rule_choices):
         rule.insert(len(rule_choices.keys()),random.choice([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]))
     else:
         rule.insert(len(rule_choices.keys()),random.choice([-1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]))
-    
-    #rule = np.array(rule)    
         
     return rule
 
@@ -30,8 +26,6 @@ def generate_ruleset(n_rules, rule_choices):
     ruleset = []
     for i in range(0, n_rules):
         ruleset.insert(i,generate_rule(rule_choices))
-        
-    #ruleset = np.array(ruleset)    
     
     return ruleset
 
@@ -41,8 +35,6 @@ def generate_collection(n_rulesets, n_rules, rule_choices):
     for i in range(0, n_rulesets):
         collection.insert(i,generate_ruleset(n_rules, rule_choices))
         
-    #collection = np.array(collection)    
-        
     return collection
 
 def roulette_wheel(collection, fitness, topn):
@@ -50,12 +42,11 @@ def roulette_wheel(collection, fitness, topn):
     relative_fitness = [f / total_fit for f in fitness]
 
     dictionary = dict(zip(range(0,20),relative_fitness))
-    #dictionary = dict(sorted(dictionary.items(), key=itemgetter(1), reverse=True))
     dictionary = dict(sorted(dictionary.items(), key=lambda x: (-x[1], x[0])))
 
     chosen = []
     while len(chosen) in range(topn):
-        r = random.random()
+        r = random.uniform(0,1)
         current = 0
         for key, value in dictionary.items():
             current += value
@@ -144,11 +135,11 @@ def evolve(collection, rule_choices, fitness, crossover_pct, mutation_pct):
     # Select best 16 from original 20 rulesets
     iteration_best80pct = roulette_wheel(collection, fitness, 16)
     # Carry out crossover
-    iteration_best80pct = crossover(iteration_best80pct, crossover_pct)
+    iteration_best80pct_cross = crossover(iteration_best80pct, crossover_pct)
     # Carry out mutation
-    iteration_best80pct = mutation(iteration_best80pct, mutation_pct, rule_choices)
+    iteration_best80pct_mutate = mutation(iteration_best80pct_cross, mutation_pct, rule_choices)
     
-    iteration_collection.extend(iteration_best80pct)
+    iteration_collection.extend(iteration_best80pct_mutate)
 
     return iteration_collection
 
@@ -174,9 +165,9 @@ def generate_rule_choices(switch, ma_type_choices, long_moving_average_choices, 
 
 ### Running the functions
 # Defining rule choices
-long_moving_average_choices = [10,20,50,100,150,200]
-short_moving_average_choices = [1,3,5,10,15,20]
-ma_type_choices = [0,1,2,3]
+# long_moving_average_choices = [10,20,50,100,150,200]
+# short_moving_average_choices = [1,3,5,10,15,20]
+# ma_type_choices = [0,1,2,3]
 
 # Create collection of 20 different ruleset consisting of 10 rules each
 #rule_choices = generate_rule_choices('same', ma_type_choices, long_moving_average_choices, short_moving_average_choices)
