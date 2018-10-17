@@ -18,7 +18,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 5
+GA_Iterations= 30
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
@@ -83,7 +83,7 @@ for i in range (0,NumberOfGroups):
     flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
     FF =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
     result = FF.getRreturn(parsed.loc[:,:])
-    Collection = genetic_algo.evolve(Collection, rule_choices, (1+ result.values) * 10000000, 0.7, 0.01)
+    Collection = genetic_algo.evolve(Collection, rule_choices, [0 if i < 0 else i for i in result.values], 0.7, 0.01)
 
     BestReturn=-10
     BestIndividual=[[]]
@@ -104,7 +104,7 @@ for i in range (0,NumberOfGroups):
 
         iteration_final_values.append(result.values)
         iteration_final_values_max.append(result.values.max())
-        Collection = genetic_algo.evolve(Collection, rule_choices, (1+ result.values) * 10000000, 0.7, 0.01)
+        Collection = genetic_algo.evolve(Collection, rule_choices, [0 if i < 0 else i for i in result.values], 0.7, 0.01)
 
     iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1,GA_Iterations+1),
                                               'Fitness Values': iteration_final_values,
