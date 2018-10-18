@@ -213,9 +213,9 @@ class FuzzyLogic:
             membershipdegree = 0
             
         if (membershipdegree < 0):
-            membershipdegree = 0
+            membershipdegree = -1
         if (membershipdegree > 1):
-            membershipdegree = 1
+            membershipdegree = -1
         return membershipdegree
 
 #
