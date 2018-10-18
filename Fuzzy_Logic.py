@@ -210,7 +210,12 @@ class FuzzyLogic:
             else:
                 membershipdegree = self.ComputeQuadraticFunction(CIntervalues[bucket+1], CIntervalues[bucket], value)                            
         else:
-            return -1.0
+            membershipdegree = 0
+            
+        if (membershipdegree < 0):
+            membershipdegree = 0
+        if (membershipdegree > 1):
+            membershipdegree = 1
         return membershipdegree
 
 #
