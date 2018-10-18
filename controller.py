@@ -63,10 +63,10 @@ for i in range (0,NumberOfGroups):
     #Close position when last test group done.In order to calculate total asset
     if i != 0:
         FirstPosition = False
-    rule_choices = genetic_algo.generate_rule_choices('different', # Parameters: 'same' or 'different'
-                                                      [0,1,2,3], # Choices for MA type
-                                                      [10,20,50,100,150,200], # Choices for m
-                                                      [1,3,5,10,15,20]) # Choices for n
+    rule_choices = genetic_algo.generate_rule_choices('different',  # Parameters: 'same' or 'different'
+                                                      [0,1,2,3],  # Choices for MA type
+                                                      [10],  #[10,20,50,100,150,200], # Choices for m
+                                                      [1])  #[1,3,5,10,15,20]) # Choices for n
     Collection = genetic_algo.generate_collection(20, 10, rule_choices)
 
     print("--------------------------------------")
@@ -97,7 +97,7 @@ for i in range (0,NumberOfGroups):
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
         if j == 0:
-            collection_records = [Collection]
+            collection_records = [Collection].copy()
         print("Processing GA iteration ",j)
         FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         result = FF.getRreturn(parsed.loc[:,:])
@@ -109,8 +109,9 @@ for i in range (0,NumberOfGroups):
 
         iteration_final_values.append(result.values)
         iteration_final_values_max.append(result.values.max())
-        # Collection = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
+        #Collection = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
         collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
+        # collection_new = Collection.copy()
         collection_records.append(collection_new)
 
 
@@ -119,6 +120,15 @@ for i in range (0,NumberOfGroups):
                                               'Max Fitness Value': iteration_final_values_max})
 
     if i == 0:
+        ### CHECK OF COLLECTION RECORDS
+        print('C Check')
+        for c in range(0, len(collection_records[0])):
+            if collection_records[1][c] in collection_records[0]:
+                print(c)
+        print('F Check')
+        for f in range(0, len(iteration_final_values_df['Fitness Values'][0])):
+            if iteration_final_values_df['Fitness Values'][1][f] in iteration_final_values_df['Fitness Values'][0]:
+                print(f)
         iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
 
     #Apply best individual to test section then record total asset.
@@ -151,11 +161,3 @@ writer.save()
 #plt.xlabel('Group')
 #plt.show()
 
-### CHECK OF COLLECTION RECORDS
-for c in range(0,len(collection_records[0])):
-    if collection_records[1][c] in collection_records[0]:
-        print(c)
-        
-for f in range(0,len(iteration_final_values_df['Fitness Values'][0])):
-    if iteration_final_values_df['Fitness Values'][1][f] in iteration_final_values_df['Fitness Values'][0]:
-        print(f)
