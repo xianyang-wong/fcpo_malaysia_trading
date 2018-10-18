@@ -109,7 +109,7 @@ for i in range (0,NumberOfGroups):
 
         iteration_final_values.append(result.values)
         iteration_final_values_max.append(result.values.max())
-        Collection = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
+        # Collection = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
         collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
         collection_records.append(collection_new)
 
