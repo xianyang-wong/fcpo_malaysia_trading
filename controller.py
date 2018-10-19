@@ -65,8 +65,8 @@ for i in range (0,NumberOfGroups):
         FirstPosition = False
     rule_choices = genetic_algo.generate_rule_choices('different',  # Parameters: 'same' or 'different'
                                                       [0,1,2,3],  # Choices for MA type
-                                                      [10],  #[10,20,50,100,150,200], # Choices for m
-                                                      [1])  #[1,3,5,10,15,20]) # Choices for n
+                                                      [10,20,50,100,150,200], # Choices for m
+                                                      [1,3,5,10,15,20]) # Choices for n
     Collection = genetic_algo.generate_collection(20, 10, rule_choices)
 
     print("--------------------------------------")
@@ -89,51 +89,55 @@ for i in range (0,NumberOfGroups):
     #Collection = genetic_algo.evolve(Collection, rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
 
     BestReturn=-10
-    BestIndividual=[[]]
+    BestIndividual=[]
     rreturnLog=[]
 
     iteration_final_values = []
     iteration_final_values_max = []
     #Apply mutated individual(out of the best from last stage) to selection section and evolve 50 generations
     for j in range(0,GA_Iterations):#some code to keep track of the best individual!!!!
-        if j == 0:
-            collection_records = [Collection].copy()
+# =============================================================================
+#         if j == 0:
+#             collection_records = [Collection].copy()
+# =============================================================================
         print("Processing GA iteration ",j)
-        FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
+        FF =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],Collection,flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         result = FF.getRreturn(parsed.loc[:,:])
         #print(result)
         if BestReturn < result.max(skipna=True):
-            BestIndividual[0] = Collection[result.idxmax(axis=0,skipna=True)]
+            BestIndividual = Collection[result.idxmax(axis=0,skipna=True)]
             rreturnLog.append(result.max(skipna=True))
             BestReturn = result.max(skipna=True)
 
         iteration_final_values.append(result.values)
         iteration_final_values_max.append(result.values.max())
-        #Collection = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min()) for i in result.values], 0.7, 0.01)
-        collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min() + 0.0000001) for i in result.values], 0.7, 0.01)
-        # collection_new = Collection.copy()
-        collection_records.append(collection_new)
+        Collection = genetic_algo.evolve(Collection, rule_choices, result.values, 0.7, 0.01)
+        #collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(result.values.min() + 0.0000001) for i in result.values], 0.7, 0.01)
+        #collection_new = Collection.copy()
+        #collection_records.append(collection_new)
 
 
     iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1,GA_Iterations+1),
                                               'Fitness Values': iteration_final_values,
                                               'Max Fitness Value': iteration_final_values_max})
 
-    if i == 0:
-        ### CHECK OF COLLECTION RECORDS
-        print('C Check')
-        for c in range(0, len(collection_records[0])):
-            if collection_records[1][c] in collection_records[0]:
-                print(c)
-        print('F Check')
-        for f in range(0, len(iteration_final_values_df['Fitness Values'][0])):
-            if iteration_final_values_df['Fitness Values'][1][f] in iteration_final_values_df['Fitness Values'][0]:
-                print(f)
-        iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
-
+# =============================================================================
+#     if i == 0:
+#         ### CHECK OF COLLECTION RECORDS
+#         print('C Check')
+#         for c in range(0, len(collection_records[0])):
+#             if collection_records[1][c] in collection_records[0]:
+#                 print(c)
+#         print('F Check')
+#         for f in range(0, len(iteration_final_values_df['Fitness Values'][0])):
+#             if iteration_final_values_df['Fitness Values'][1][f] in iteration_final_values_df['Fitness Values'][0]:
+#                 print(f)
+#         iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
+# 
+# =============================================================================
     #Apply best individual to test section then record total asset.
     print(rreturnLog)
-    Collection = BestIndividual
+    Collection[0] = BestIndividual
     FF =FitnessFunction.FitnessFunction(y3,y4,parsed.loc[:,:],Collection,flogic,AccountStatus,FirstPosition,True,TradeWhenIntersection)
     #store account status after applying best individual.
     AccountStatus = FF.getAccountStatus()
