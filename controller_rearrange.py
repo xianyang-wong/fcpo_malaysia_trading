@@ -21,7 +21,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 2
+GA_Iterations= 200
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
@@ -77,21 +77,22 @@ for i in range (0,NumberOfGroups):
     iteration_final_values = []
     iteration_final_values_max = []
 
+    print("--------------------------------------")
+    print("Begin of group: ", i + 1, datetime.datetime.now())
+    y1 += SubGroupSize
+    y2 = y1 + SubGroupSize
+    y3 = y2 + SubGroupSize
+    y4 = y3 + SubGroupSize
+    print('Begin of training SubGroup: ' + str(y1))
+    print('Begin of select SubGroup: ' + str(y2))
+    print('Begin of testing SubGroup: ' + str(y3))
+    print('End of testing SubGroup: ' + str(y4))
+    if (y4 + SubGroupSize) > len(parsed):
+        y4 = len(parsed) - 1
+        print('Final end of testing SubGroup: ' + str(y4))
+
     for j in range(0,GA_Iterations):
         print("Processing Group ", i+1, "out of ", NumberOfGroups, "GA iteration ", j+1, "out of ", GA_Iterations)
-        print("--------------------------------------")
-        print("Begin of group: ",i+1,datetime.datetime.now())
-        y1 += SubGroupSize
-        y2 = y1 + SubGroupSize
-        y3 = y2 + SubGroupSize
-        y4 = y3 + SubGroupSize
-        print('Begin of training SubGroup: '+ str(y1))
-        print('Begin of select SubGroup: '+ str(y2))
-        print('Begin of testing SubGroup: '+ str(y3))
-        print('End of testing SubGroup: '+ str(y4))
-        if (y3+SubGroupSize)>len(parsed):
-            y4=len(parsed)-1
-            print('Final end of testing SubGroup: '+ str(y4))
 
         flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
         FFTrain =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
