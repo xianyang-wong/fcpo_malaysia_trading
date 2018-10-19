@@ -21,7 +21,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 2
+GA_Iterations= 50
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
