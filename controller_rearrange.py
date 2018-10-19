@@ -89,12 +89,12 @@ for i in range (0,NumberOfGroups):
         print('Begin of select SubGroup: '+ str(y2))
         print('Begin of testing SubGroup: '+ str(y3))
         print('End of testing SubGroup: '+ str(y4))
-        if (y4+SubGroupSize)>len(parsed):
+        if (y3+SubGroupSize)>len(parsed):
             y4=len(parsed)-1
             print('Final end of testing SubGroup: '+ str(y4))
 
-        flogicTrain = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
-        FFTrain =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],collection_records[j],flogicTrain,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
+        flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
+        FFTrain =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         resultTrain = FFTrain.getRreturn(parsed.loc[:,:])
         iteration_final_values.append(resultTrain.values)
         iteration_final_values_max.append(resultTrain.values.max())
@@ -102,8 +102,7 @@ for i in range (0,NumberOfGroups):
         BestReturnTrain=resultTrain.max()
         BestIndividualTrain=collection_records[j][resultTrain.idxmax(axis=0)]
 
-        flogicSelection = fuzzy.FuzzyLogic(y2, y3, parsed.loc[:, :], True, True)
-        FFSelection =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogicSelection,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
+        FFSelection =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         resultSelection = FFSelection.getRreturn(parsed.loc[:,:])
 
         BestReturnSelection = resultSelection.max()
@@ -127,7 +126,7 @@ for i in range (0,NumberOfGroups):
     TestCollection = collection_records[0].copy()
     TestCollection[0] = BestIndividual
 
-    FFTest =FitnessFunction.FitnessFunction(y3,y4,parsed.loc[:,:],TestCollection,flogicTrain,AccountStatus,FirstPosition,True,TradeWhenIntersection)
+    FFTest =FitnessFunction.FitnessFunction(y3,y4,parsed.loc[:,:],TestCollection,flogic,AccountStatus,FirstPosition,True,TradeWhenIntersection)
     #store account status after applying best individual.
     AccountStatus = FFTest.getAccountStatus()
     totalAsset = FFTest.getTotalAsset(parsed.loc[:,:])
