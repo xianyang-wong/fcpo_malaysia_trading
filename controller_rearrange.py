@@ -21,7 +21,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 200
+GA_Iterations= 150
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
@@ -76,6 +76,7 @@ for i in range (0,NumberOfGroups):
     rreturnLog = []
     iteration_final_values = []
     iteration_final_values_max = []
+    BestIndividual = []
 
     print("--------------------------------------")
     print("Begin of group: ", i + 1, datetime.datetime.now())
@@ -110,14 +111,26 @@ for i in range (0,NumberOfGroups):
         BestIndividualSelection = collection_records[j][resultSelection.idxmax(axis=0)]
 
         # Comparing Selection and Train returns after normalizing train returns to same period length as selection
-        if BestReturnSelection - (((1+BestReturnTrain)**0.5)-1) > 0.05:
-            BestIndividual = BestIndividualSelection
-            rreturnLog.append(((1+BestReturnSelection)**2)-1)
-            BestReturn = ((1+BestReturnSelection)**2)-1
+        if BestReturnSelection - (((1 + BestReturnTrain) ** 0.5) - 1) > 0.05:
+            BestIndividualTemp = BestIndividualSelection
+            rreturnLogTemp = ((1 + BestReturnSelection) ** 2) - 1
+            BestReturnTemp = ((1 + BestReturnSelection) ** 2) - 1
         else:
-            BestIndividual = BestIndividualTrain
-            rreturnLog.append(BestReturnTrain)
-            BestReturn = BestReturnTrain
+            BestIndividualTemp = BestIndividualTrain
+            rreturnLogTemp = BestReturnTrain
+            BestReturnTemp = BestReturnTrain
+
+        if j == 0:
+            BestIndividual.append(BestIndividualTemp)
+            rreturnLog.append(rreturnLogTemp)
+            BestReturn = BestReturnTemp
+        elif BestReturnTemp < BestReturn:
+            BestIndividual.append(BestIndividual[j-1])
+            rreturnLog.append(BestReturn)
+        else:
+            BestIndividual.append(BestIndividualTemp)
+            rreturnLog.append(rreturnLogTemp)
+            BestReturn = BestReturnTemp
 
         collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(resultTrain.values.min() + 0.0000001) for i in resultTrain.values], 0.7, 0.01)
         collection_records.append(collection_new)
