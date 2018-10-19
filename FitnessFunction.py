@@ -215,7 +215,7 @@ class FitnessFunction:
                 tmpProfit.iloc[IndividualCount]['profit'] += 25 * self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
             else:
                 tmpProfit.iloc[IndividualCount]['profit'] += 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
-        print(((tmpProfit['profit'] + self.DfFitness['riskfree'] - self.DfFitness['cost']  )/self.DfFitness['capital']))
+        #print(((tmpProfit['profit'] + self.DfFitness['riskfree'] - self.DfFitness['cost']  )/self.DfFitness['capital']))
         return ((tmpProfit['profit'] + self.DfFitness['riskfree'] - self.DfFitness['cost']  )/self.DfFitness['capital'])
     
     def getTotalAsset(self,df):
