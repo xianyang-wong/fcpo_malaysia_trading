@@ -16,11 +16,22 @@ import numpy as np
 import itertools
 import random
 
-
+# =============================================================================
+# test1 = pd.DataFrame(np.array([1,2,3]).reshape(3,1),columns=['a'])
+# test2 = pd.DataFrame(np.array([4,5,6]).reshape(3,1),columns=['b'])
+# test3 = test1['a']* test2['b']*10
+# test4=test1.loc[:,['a']]
+# print("this is:",test2.loc[2,['b']])
+# test1['a'] = test2.iloc[:,0:1].copy()
+# test2['b']=[8,8,8]
+# print(test4._is_view)
+# test1['a']=[5,5,5]
+# print(test4)
+# =============================================================================
 directory = ''
 
 #configuration parameters.
-GA_Iterations= 5
+GA_Iterations= 3
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
