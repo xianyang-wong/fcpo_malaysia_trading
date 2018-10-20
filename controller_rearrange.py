@@ -21,7 +21,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 10
+GA_Iterations= 50
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
@@ -113,8 +113,8 @@ for i in range (0,NumberOfGroups):
         BestReturnAverage = max(ReturnAverage)
         BestIndividualAverage = collection_records[j][ReturnAverage.idxmax(axis=0)]
 
-        iteration_final_values.append(ReturnAverage.values)
-        iteration_final_values_max.append(ReturnAverage.values.max())
+        iteration_final_values.append(resultSelection.values)
+        iteration_final_values_max.append(resultSelection.values.max())
 
         if j == 0:
             BestIndividual.append(BestIndividualAverage)
