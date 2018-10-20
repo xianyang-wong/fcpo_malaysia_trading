@@ -21,7 +21,7 @@ directory = ''
 
 #configuration parameters.
 
-GA_Iterations= 150
+GA_Iterations= 10
 
 #SubGroupSize=0# No need to change
 TargetIndex=1000
@@ -69,8 +69,9 @@ for i in range (0,NumberOfGroups):
                                                       [10,20,50,100,150,200], # Choices for m
                                                       [1,3,5,10,15,20]) # Choices for n
 
-    # Generate initial collection of rulesets
+    # Generate initial collection of rulesets and fuzzy
     collection_records = [genetic_algo.generate_collection(20, 10, rule_choices)]
+
 
     # To log results from train period
     rreturnLog = []
@@ -92,47 +93,65 @@ for i in range (0,NumberOfGroups):
         y4 = len(parsed) - 1
         print('Final end of testing SubGroup: ' + str(y4))
 
+    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], True, True)
+
     for j in range(0,GA_Iterations):
         print("Processing Group ", i+1, "out of ", NumberOfGroups, "GA iteration ", j+1, "out of ", GA_Iterations)
-
-        flogic = fuzzy.FuzzyLogic(y1, y3,parsed.loc[:,:],True,True)
         FFTrain =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         resultTrain = FFTrain.getRreturn(parsed.loc[:,:])
-        iteration_final_values.append(resultTrain.values)
-        iteration_final_values_max.append(resultTrain.values.max())
 
-        BestReturnTrain=resultTrain.max()
-        BestIndividualTrain=collection_records[j][resultTrain.idxmax(axis=0)]
+        #BestReturnTrain=resultTrain.max()
+        #BestIndividualTrain=collection_records[j][resultTrain.idxmax(axis=0)]
 
         FFSelection =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         resultSelection = FFSelection.getRreturn(parsed.loc[:,:])
 
-        BestReturnSelection = resultSelection.max()
-        BestIndividualSelection = collection_records[j][resultSelection.idxmax(axis=0)]
+        #BestReturnSelection = resultSelection.max()
+        #BestIndividualSelection = collection_records[j][resultSelection.idxmax(axis=0)]
 
-        # Comparing Selection and Train returns after normalizing train returns to same period length as selection
-        if BestReturnSelection - (((1 + BestReturnTrain) ** 0.5) - 1) > 0.05:
-            BestIndividualTemp = BestIndividualSelection
-            rreturnLogTemp = ((1 + BestReturnSelection) ** 2) - 1
-            BestReturnTemp = ((1 + BestReturnSelection) ** 2) - 1
-        else:
-            BestIndividualTemp = BestIndividualTrain
-            rreturnLogTemp = BestReturnTrain
-            BestReturnTemp = BestReturnTrain
+        ReturnAverage = ((((1 + resultTrain) ** 0.5) - 1)+resultSelection)*0.5
+        BestReturnAverage = max(ReturnAverage)
+        BestIndividualAverage = collection_records[j][ReturnAverage.idxmax(axis=0)]
+
+        iteration_final_values.append(ReturnAverage.values)
+        iteration_final_values_max.append(ReturnAverage.values.max())
 
         if j == 0:
-            BestIndividual.append(BestIndividualTemp)
-            rreturnLog.append(rreturnLogTemp)
-            BestReturn = BestReturnTemp
-        elif BestReturnTemp < BestReturn:
+            BestIndividual.append(BestIndividualAverage)
+            rreturnLog.append(ReturnAverage[ReturnAverage.idxmax(axis=0)])
+            BestReturn = resultSelection[ReturnAverage.idxmax(axis=0)]
+        elif BestReturnAverage < BestReturn:
             BestIndividual.append(BestIndividual[j-1])
             rreturnLog.append(BestReturn)
         else:
-            BestIndividual.append(BestIndividualTemp)
-            rreturnLog.append(rreturnLogTemp)
-            BestReturn = BestReturnTemp
+            BestIndividual.append(BestIndividualAverage)
+            rreturnLog.append(BestReturnAverage)
+            BestReturn = BestReturnAverage
 
-        collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(resultTrain.values.min() + 0.0000001) for i in resultTrain.values], 0.7, 0.01)
+        # Comparing Selection and Train returns after normalizing train returns to same period length as selection
+
+        # if BestReturnSelection - (((1 + BestReturnTrain) ** 0.5) - 1) > 0.05:
+        #     BestIndividualTemp = BestIndividualSelection
+        #     rreturnLogTemp = ((1 + BestReturnSelection) ** 2) - 1
+        #     BestReturnTemp = ((1 + BestReturnSelection) ** 2) - 1
+        # else:
+        #     BestIndividualTemp = BestIndividualTrain
+        #     rreturnLogTemp = BestReturnTrain
+        #     BestReturnTemp = BestReturnTrain
+        #
+        # if j == 0:
+        #      BestIndividual.append(BestIndividualTemp)
+        #      rreturnLog.append(rreturnLogTemp)
+        #      BestReturn = BestReturnTemp
+        # elif BestReturnTemp < BestReturn:
+        #      BestIndividual.append(BestIndividual[j-1])
+        #      rreturnLog.append(BestReturn)
+        # else:
+        #      BestIndividual.append(BestIndividualTemp)
+        #      rreturnLog.append(rreturnLogTemp)
+        #      BestReturn = BestReturnTemp
+
+        collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(ReturnAverage.values.min() + 0.0000001) for i in ReturnAverage.values], 0.7, 0.01)
         collection_records.append(collection_new)
 
     #Apply best individual to test section then record total asset.
@@ -150,20 +169,32 @@ for i in range (0,NumberOfGroups):
         break
     print("--------------------------------------")
 
-    if i == 0:
-         ### CHECK OF COLLECTION RECORDS
-         iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1, GA_Iterations + 1),
-                                                   'Fitness Values': iteration_final_values,
-                                                   'Max Fitness Value': iteration_final_values_max})
-         print('C Check')
+    ### SAVING CHECK OF COLLECTION RECORDS
+
+
+     iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1, GA_Iterations + 1),
+                                               'Fitness Values': iteration_final_values,
+                                               'Max Fitness Value': iteration_final_values_max,
+                                               'BestIndividual': BestIndividual,
+                                               'BestReturn': rreturnLog})
+     for rows in range(0+1,iteration_final_values_df.shape[0]-1):
+         print(rows)
+         c_check = []
+         f_check = []
+
          for c in range(0, len(collection_records[0])):
-             if collection_records[1][c] in collection_records[0]:
-                 print(c)
-         print('F Check')
+             if collection_records[rows][c] in collection_records[rows-1]:
+                 c_check.append(c)
+
          for f in range(0, len(iteration_final_values_df['Fitness Values'][0])):
-             if iteration_final_values_df['Fitness Values'][1][f] in iteration_final_values_df['Fitness Values'][0]:
-                 print(f)
-         iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
+             if iteration_final_values_df['Fitness Values'][rows][f] in iteration_final_values_df['Fitness Values'][rows-1]:
+                 f_check.append(f)
+
+         if set(c_check) <= set(f_check):
+             print(True)
+         else:
+             print(False)
+     iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
 
 print(len(totalAssets))
 print(totalAssets)
