@@ -125,7 +125,7 @@ class FitnessFunction:
             #Calculate Profit and cost since it is affected by buy or sell option.
             for IndividualCount in range(0,20):        
                 #Calculate holding
-                TmpDfFitness.loc[IndividualCount,'holding'] = (((self.DfFitness.loc[IndividualCount,'capital'] + self.DfFitness.loc[IndividualCount,'profit'] - self.DfFitness.loc[IndividualCount,'deposit']- self.DfFitness.loc[IndividualCount,'cost']) /5000)* rlevelList[IndividualCount]).round()#Easier way#(df.High[index] * self.Deposit))* self.DfRlevel).round()
+                TmpDfFitness.loc[IndividualCount,'holding'] = (((self.DfFitness.loc[IndividualCount,'capital'] + self.DfFitness.loc[IndividualCount,'profit'] - self.DfFitness.loc[IndividualCount,'cost']) /5000)* rlevelList[IndividualCount]).round()#Easier way#(df.High[index] * self.Deposit))* self.DfRlevel).round()
                 HoldingDiff = (self.DfFitness.loc[IndividualCount,'holding'] - TmpDfFitness.loc[IndividualCount,'holding']) * 1.0
                 currentTradePrice=0
                 if HoldingDiff < 0:#this means buy,HoldingDiff is negative.
@@ -171,7 +171,7 @@ class FitnessFunction:
             self.DfFitness.loc[:,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']] = TmpDfFitness.loc[:,['capital','profit','holding','cost','riskfree','deposit','lastTradeValue']]
             self.tmpLog.append(self.DfFitness.profit[0])
             #calculate riskFree
-            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost ) / 365
+            self.DfFitness.riskfree += self.rfrate * (self.DfFitness.capital - self.DfFitness.deposit + self.DfFitness.profit + self.DfFitness.riskfree - self.DfFitness.cost ) / 250
             
             #Log and plot part
             self.tmpLog.append(self.DfFitness.holding[0])

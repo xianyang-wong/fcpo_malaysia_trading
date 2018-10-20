@@ -64,7 +64,7 @@ for i in range (0,NumberOfGroups):
     if i != 0:
         FirstPosition = False
 
-    rule_choices = genetic_algo.generate_rule_choices('different',  # Parameters: 'same' or 'different'
+    rule_choices = genetic_algo.generate_rule_choices('same',  # Parameters: 'same' or 'different'
                                                       [0,1,2,3],  # Choices for MA type
                                                       [10,20,50,100,150,200], # Choices for m
                                                       [1,3,5,10,15,20]) # Choices for n
@@ -93,7 +93,7 @@ for i in range (0,NumberOfGroups):
         y4 = len(parsed) - 1
         print('Final end of testing SubGroup: ' + str(y4))
 
-    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], True, True)
+    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], False, False)
 
     for j in range(0,GA_Iterations):
         print("Processing Group ", i+1, "out of ", NumberOfGroups, "GA iteration ", j+1, "out of ", GA_Iterations)
@@ -172,12 +172,12 @@ for i in range (0,NumberOfGroups):
     ### SAVING CHECK OF COLLECTION RECORDS
 
 
-     iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1, GA_Iterations + 1),
+    iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1, GA_Iterations + 1),
                                                'Fitness Values': iteration_final_values,
                                                'Max Fitness Value': iteration_final_values_max,
                                                'BestIndividual': BestIndividual,
                                                'BestReturn': rreturnLog})
-     for rows in range(0+1,iteration_final_values_df.shape[0]-1):
+    for rows in range(0+1,iteration_final_values_df.shape[0]-1):
          print(rows)
          c_check = []
          f_check = []
@@ -194,7 +194,7 @@ for i in range (0,NumberOfGroups):
              print(True)
          else:
              print(False)
-     iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
+    iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
 
 print(len(totalAssets))
 print(totalAssets)
