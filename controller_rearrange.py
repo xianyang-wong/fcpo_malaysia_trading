@@ -138,7 +138,7 @@ for i in range (0,NumberOfGroups):
     #Apply best individual to test section then record total asset.
     print(rreturnLog)
     TestCollection = collection_records[0].copy()
-    TestCollection[0] = BestIndividual
+    TestCollection[0] = BestIndividual[j]
 
     FFTest =FitnessFunction.FitnessFunction(y3,y4,parsed.loc[:,:],TestCollection,flogic,AccountStatus,FirstPosition,True,TradeWhenIntersection)
     #store account status after applying best individual.
