@@ -128,29 +128,6 @@ for i in range (0,NumberOfGroups):
             rreturnLog.append(BestReturnAverage)
             BestReturn = BestReturnAverage
 
-        # Comparing Selection and Train returns after normalizing train returns to same period length as selection
-
-        # if BestReturnSelection - (((1 + BestReturnTrain) ** 0.5) - 1) > 0.05:
-        #     BestIndividualTemp = BestIndividualSelection
-        #     rreturnLogTemp = ((1 + BestReturnSelection) ** 2) - 1
-        #     BestReturnTemp = ((1 + BestReturnSelection) ** 2) - 1
-        # else:
-        #     BestIndividualTemp = BestIndividualTrain
-        #     rreturnLogTemp = BestReturnTrain
-        #     BestReturnTemp = BestReturnTrain
-        #
-        # if j == 0:
-        #      BestIndividual.append(BestIndividualTemp)
-        #      rreturnLog.append(rreturnLogTemp)
-        #      BestReturn = BestReturnTemp
-        # elif BestReturnTemp < BestReturn:
-        #      BestIndividual.append(BestIndividual[j-1])
-        #      rreturnLog.append(BestReturn)
-        # else:
-        #      BestIndividual.append(BestIndividualTemp)
-        #      rreturnLog.append(rreturnLogTemp)
-        #      BestReturn = BestReturnTemp
-
         collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(ReturnAverage.values.min() + 0.0000001) for i in ReturnAverage.values], 0.7, 0.01)
         collection_records.append(collection_new)
 
@@ -177,23 +154,7 @@ for i in range (0,NumberOfGroups):
                                                'Max Fitness Value': iteration_final_values_max,
                                                'BestIndividual': BestIndividual,
                                                'BestReturn': rreturnLog})
-    for rows in range(0+1,iteration_final_values_df.shape[0]-1):
-         print(rows)
-         c_check = []
-         f_check = []
 
-         for c in range(0, len(collection_records[0])):
-             if collection_records[rows][c] in collection_records[rows-1]:
-                 c_check.append(c)
-
-         for f in range(0, len(iteration_final_values_df['Fitness Values'][0])):
-             if iteration_final_values_df['Fitness Values'][rows][f] in iteration_final_values_df['Fitness Values'][rows-1]:
-                 f_check.append(f)
-
-         if set(c_check) <= set(f_check):
-             print(True)
-         else:
-             print(False)
     iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
 
 print(len(totalAssets))
