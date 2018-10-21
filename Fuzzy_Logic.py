@@ -218,34 +218,7 @@ class FuzzyLogic:
             membershipdegree = -1
         return membershipdegree
 
-#
-#
-#print ("Test")
-#
-#
-#data = pd.read_excel('data/FCPO_6_years_NUS_ParsedByDay.xlsx')
-#trainingStart= 500
-#print (len(data) )
-#traningEnd = 2000
-#floglic = FuzzyLogic(trainingStart, traningEnd,data, False, True) #False for Cluster, True for using 2 MA Values
-#floglic.PlotGraph(3, 200, 10, 1) #Last value for the 2nd MA Type
-#floglic.PlotGraph(3, 200, 10, 3) #Last value for the 2nd MA Type
-#for i in range(-10, 10):  
-#    print (i)
-#    print (floglic.ComputeMembership( i,200,10,0,1,3)) # value, m, n, MA_Type, bucket, MA_Type2
-#    print (floglic.ComputeMembership( i,200,10,3,1,2)) 
-#
-#
-#floglic = FuzzyLogic(trainingStart, traningEnd,data, False, False) #False for Cluster, False for using 2 MA Values
-#floglic.PlotGraph(3, 200, 10)
-#
-#for i in range(-10, 10):  
-#    print (i)
-#    print (floglic.ComputeMembership( i,200,10,0,1)) # value, m, n, MA_Type, bucket
-#    print (floglic.ComputeMembership( i,200,10,3,1)) 
-#
-#
-#
+
 
 
 
