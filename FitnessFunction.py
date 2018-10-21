@@ -212,14 +212,13 @@ class FitnessFunction:
         tmpProfit = self.DfFitness.loc[:, ['profit']].copy()
         for IndividualCount in range(0,20):  
             if self.DfFitness.holding[IndividualCount] > 0:
-                tmpProfit.iloc[IndividualCount]['profit'] += 25 * self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                tmpProfit.loc[IndividualCount,'profit'] += 25 * self.DfFitness.iloc[IndividualCount]['holding'] * (df.Low[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
             else:
-                tmpProfit.iloc[IndividualCount]['profit'] += 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
+                tmpProfit.loc[IndividualCount,'profit'] += 25 *self.DfFitness.iloc[IndividualCount]['holding'] * (df.High[self.EndIndex]  - self.DfFitness.iloc[IndividualCount]['lastTradeValue'])
         result = (tmpProfit['profit'] + self.DfFitness['riskfree'] - self.DfFitness['cost']  )/self.DfFitness['capital']
         result[0]=np.NaN
+        result[5]=np.NaN
         result = result.fillna(0)
-        if result.isnull().values.any():
-            print("NAN spotted")
         return result
     
     def getTotalAsset(self,df):
