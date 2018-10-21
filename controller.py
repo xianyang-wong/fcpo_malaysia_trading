@@ -117,7 +117,7 @@ for i in range (0,NumberOfGroups):
             rreturnLog.append(BestReturnAverage)
             BestReturn = BestReturnAverage
 
-        collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(ReturnAverage.values.min() + 0.0000001) for i in ReturnAverage.values], 0.7, 0.01)
+        collection_new = genetic_algo.evolve(collection_records[j], rule_choices, [i + np.abs(ReturnAverage.values.min() + 0.01) for i in ReturnAverage.values], 0.7, 0.01)
         collection_records.append(collection_new)
 
     #Apply best individual to test section then record total asset.
