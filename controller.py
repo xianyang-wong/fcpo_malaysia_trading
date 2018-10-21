@@ -64,7 +64,7 @@ for i in range (0,NumberOfGroups):
     if i != 0:
         FirstPosition = False
 
-    rule_choices = genetic_algo.generate_rule_choices('same',  # Parameters: 'same' or 'different'
+    rule_choices = genetic_algo.generate_rule_choices('different',  # Parameters: 'same' or 'different'
                                                       [0,1,2,3],  # Choices for MA type
                                                       [10,20,50,100,150,200], # Choices for m
                                                       [1,3,5,10,15,20]) # Choices for n
@@ -73,10 +73,8 @@ for i in range (0,NumberOfGroups):
     collection_records = [genetic_algo.generate_collection(20, 10, rule_choices)]
 
 
-    # To log results from train period
+    # To log results from train and selection period
     rreturnLog = []
-    iteration_final_values = []
-    iteration_final_values_max = []
     BestIndividual = []
 
     print("--------------------------------------")
@@ -93,28 +91,19 @@ for i in range (0,NumberOfGroups):
         y4 = len(parsed) - 1
         print('Final end of testing SubGroup: ' + str(y4))
 
-    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], False, False)
+    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], True, False)
 
     for j in range(0,GA_Iterations):
         print("Processing Group ", i+1, "out of ", NumberOfGroups, "GA iteration ", j+1, "out of ", GA_Iterations)
         FFTrain =FitnessFunction.FitnessFunction(y1,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         resultTrain = FFTrain.getRreturn(parsed.loc[:,:])
 
-        #BestReturnTrain=resultTrain.max()
-        #BestIndividualTrain=collection_records[j][resultTrain.idxmax(axis=0)]
-
         FFSelection =FitnessFunction.FitnessFunction(y2,y3,parsed.loc[:,:],collection_records[j],flogic,[10000000.0,0,0,0,0,0,0],True,False,TradeWhenIntersection)
         resultSelection = FFSelection.getRreturn(parsed.loc[:,:])
-
-        #BestReturnSelection = resultSelection.max()
-        #BestIndividualSelection = collection_records[j][resultSelection.idxmax(axis=0)]
 
         ReturnAverage = ((((1 + resultTrain) ** 0.5) - 1)+resultSelection)*0.5
         BestReturnAverage = max(ReturnAverage)
         BestIndividualAverage = collection_records[j][ReturnAverage.idxmax(axis=0)]
-
-        iteration_final_values.append(resultSelection.values)
-        iteration_final_values_max.append(resultSelection.values.max())
 
         if j == 0:
             BestIndividual.append(BestIndividualAverage)
@@ -146,17 +135,6 @@ for i in range (0,NumberOfGroups):
         break
     print("--------------------------------------")
 
-    ### SAVING CHECK OF COLLECTION RECORDS
-
-
-    iteration_final_values_df = pd.DataFrame({'GA Iteration': np.arange(1, GA_Iterations + 1),
-                                               'Fitness Values': iteration_final_values,
-                                               'Max Fitness Value': iteration_final_values_max,
-                                               'BestIndividual': BestIndividual,
-                                               'BestReturn': rreturnLog})
-
-    iteration_final_values_df.to_csv(os.path.join(directory, 'data/'+'Group'+str(i+1)+'_iteration_final_values.csv'))
-
 print(len(totalAssets))
 print(totalAssets)
 
@@ -167,10 +145,3 @@ print(df)
 writer = pd.ExcelWriter(os.path.join(directory,'data/TotalAssets.xlsx'), engine='xlsxwriter')
 df.to_excel(writer)
 writer.save()
-
-
-#plt.plot(totalAssets)
-#plt.ylabel('Total Assets')
-#plt.xlabel('Group')
-#plt.show()
-
