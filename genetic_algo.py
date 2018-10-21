@@ -50,7 +50,7 @@ def roulette_wheel(collection, fitness, topn):
         current = 0
         for key, value in dictionary.items():
             current += value
-            if (current > r) & (key not in chosen):
+            if (current >= r) & (key not in chosen):
                 chosen.append(key)
                 break
 
