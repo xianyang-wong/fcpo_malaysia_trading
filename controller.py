@@ -91,7 +91,7 @@ for i in range (0,NumberOfGroups):
         y4 = len(parsed) - 1
         print('Final end of testing SubGroup: ' + str(y4))
 
-    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], True, False)
+    flogic = fuzzy.FuzzyLogic(y1, y3, parsed.loc[:, :], True, True)
 
     for j in range(0,GA_Iterations):
         print("Processing Group ", i+1, "out of ", NumberOfGroups, "GA iteration ", j+1, "out of ", GA_Iterations)
