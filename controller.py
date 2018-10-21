@@ -23,7 +23,6 @@ directory = ''
 
 GA_Iterations= 50
 
-#SubGroupSize=0# No need to change
 TargetIndex=1000
 TradeWhenIntersection=True #set to True if only trade at intersection or False if trade at every data point
 dfType = 2 # 1: run datafile by min   2:run datafile by day 3: run datafile by hour
@@ -37,11 +36,8 @@ elif dfType == 3:
     SubGroupSize=250
     parsed = pd.read_excel(os.path.join(directory,'data/FCPO_6_years_NUS_ParsedByHour.xlsx'))
 
-#noOfDays = parsed.groupby(['Date']).aggregate({'Date':'count'})
-#print('Number of Days: ', len(noOfDays))
 print('--------------')
 print("Total number of indexes: ",len(parsed))
-# NumberOfGroups = int((len(parsed) / SubGroupSize) -3)
 NumberOfGroups = int(len(parsed) / 2 / SubGroupSize)
 print("Total number of groups: ",NumberOfGroups)
 print('--------------')
